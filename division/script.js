@@ -1,7 +1,7 @@
 var config = {
     type: Phaser.AUTO,
-    width: 2000,
-    height: 1300,
+    width: window.innerWidth,
+    height: window.innerHeight,
     physics: {
         default: 'arcade',
         arcade: {
@@ -50,7 +50,7 @@ let lineaEspaciadora = 0
 // Variable para tener control de la ubicacion de la siguiente caja de texto de cociente que se pondra,
 // almacena un indice haciendo referencia al numero de caja
 let numeroCajaCociente = 1
-//Indice para tener control sobre en que parte poner la linea separadora de la resta
+//Indice para tener control sobre en que parte poner la linea separadora de la resta en el eje x
 let indicePosicionLineaResta = 1
 // Posicion para ubicar las lineas separadoras del resultado de resta en el eje y
 let posicionLineaRestaEjeY = 315
@@ -65,9 +65,6 @@ const inputStyle = {
 function preload() {
     this.load.image('bg', 'bg.png');
     //this.load.image('letter-d', 'letter-d.png');
-
-    this.load.html('login', 'form.html');
-    //this.load.atlas('cards', 'assets/atlas/cards.png', 'assets/atlas/cards.json');
 }
 
 function create() {
@@ -77,9 +74,10 @@ function create() {
     //initializacion del contexto
     context = this;
 
-    spritebg = this.add.image(1000, 580, 'bg');
-    spritebg.setScale(1)
+    spritebg = this.add.image(1000, 500, 'bg');
 
+
+    spritebg.setScale(1);
     // letterD.setScale(1)
     // posicionar numeros de dividendo y divisor
     positionNumbers(this, dividendo)
@@ -136,7 +134,7 @@ function positionNumbers(context, dividendo) {
         posicionarDividendo(context, char, posX -= 2, 2)
     }
 }
-
+//Parametros en caso de necesitar propiedades especificas
 function createOtherArrow(context, x, y, escala, parametros) {
     const graphics = context.add.graphics()
 
@@ -263,7 +261,7 @@ function posicionarDividendo(context, valor, posX, posY) {
         .setInteractive({ cursor: 'pointer' })
         .on('pointerdown', () => {
             // This function will be called when the button is clicked
-            window.location.href = 'experiment-game/index.html'; // Replace with your desired URL
+            window.location.href = 'http://127.0.0.1:5501/index.html'; // Replace with your desired URL
         });
     // Set origin to center for proper positioning
     button.setOrigin(posX, posY);
@@ -274,8 +272,7 @@ function posicionarDividendo(context, valor, posX, posY) {
  */
 function crearCajaTexto(context, posX, posY, width, height, tipo) {
     index++;
-    //let inputText;
-    let cursorBlinkIntervalId;
+    // let cursorBlinkIntervalId; pendiente implementar
     let inputBackground = context.add.rectangle(1100, posY, width, height, 'orange').setData({ 'index': 'R' + index, 'tipo': tipo }).
         setInteractive({ cursor: 'pointer' })
         .on('pointerdown', function () {
@@ -308,14 +305,13 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
              }*/
         });
 
-
     function handleTextInputChange(event) {
+        // Rectangle
         let auxInputBackground = context.children.getChildren().
             find(element => element.getData('index') === inputTextBoxClicked);
-
+        // Elemento de texto posicionado dentro de la caja
         const cajaTexto = context.children.getChildren().
             find(element => element.getData('index') === 'texto' + inputTextBoxClicked);
-
 
         if (auxInputBackground?.getData('tipo') == 'cociente') {
             // si es un digito
@@ -332,11 +328,10 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     group.setVisible(false)
                     crearGloboInformacion(context, "Ahora multiplica el numero que encontraste\npor el divisor y lo ubicas en las cajas\n"
                         + "negras para realizar la resta", 500, 100, 500, 100)
-                    //Poner cajs resta y estructura
+                    //Poner cajas resta y estructura
                     ponerCajasResta()
                     context.input.keyboard.off('keydown', handleTextInputChange, context);
                     keyDownEventHandler = false
-                    //dibujarLineaResta(context, 635 + indicePosicionLineaResta * 40, 320, determinarDigitosASeparar(dividendo, divisor))
                     ultimoDigitoCociente = cajaTexto.text
                 }
             } else {
@@ -648,8 +643,15 @@ function comprobarDigitoBajado(numeroIngresado) {
 }
 
 function ocultarFlechasPistaBajarNumero() {
-    context.children.getChildren().find(element =>
-        element.getData('tipo') === 'flechaBajarDigito').visible = false
+    context.children.getChildren().filter(element => {
+        if (element.getData('tipo') === 'flechaBajarDigito') {
+
+            console.log(element)
+            element.visible = false
+        }
+    }).forEach(arrow => {
+        arrow.visible = false
+    });
 }
 
 function TransformarFigura() {
