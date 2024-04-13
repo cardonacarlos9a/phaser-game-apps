@@ -54,6 +54,12 @@ let numeroCajaCociente = 1
 let indicePosicionLineaResta = 1
 // Posicion para ubicar las lineas separadoras del resultado de resta en el eje y
 let posicionLineaRestaEjeY = 315
+//Audio incorrecto
+let tryAgain
+// Get the width and height of the game screen
+let screenWidth = 0
+let screenHeight = 0
+
 
 const inputStyle = {
     backgroundColor: '#ffffff',
@@ -65,6 +71,8 @@ const inputStyle = {
 function preload() {
     this.load.image('bg', 'bg.png');
     //this.load.image('letter-d', 'letter-d.png');
+    this.load.image('questionMark', 'questionMark.svg');
+    this.load.audio('tryAgain', ['ohno.mp3'])
 }
 
 function create() {
@@ -73,19 +81,35 @@ function create() {
     arrowGroup = this.add.group();
     //initializacion del contexto
     context = this;
+    // Get the width and height of the game screen
+    screenWidth = this.sys.game.config.width;
+    screenHeight = this.sys.game.config.height;
 
-    spritebg = this.add.image(1000, 500, 'bg');
+    spritebg = this.add.image(0, 0, 'bg');
+    spritebg.setOrigin(0, 0)
+    // Calculate the aspect ratio of the image
+    const aspectRatio = spritebg.width / spritebg.height;
+    // Adjust the width and height to fit the screen while maintaining the aspect ratio
+    if (screenWidth / screenHeight > aspectRatio) {
+        // Screen is wider than the image
+        spritebg.setDisplaySize(screenHeight * aspectRatio, screenHeight);
+    } else {
+        // Screen is taller than the image
+        spritebg.setDisplaySize(screenWidth, screenWidth / aspectRatio);
+    }
+
+    // Center the image on the screen
+    spritebg.setPosition((screenWidth - spritebg.displayWidth) / 2, (screenHeight - spritebg.displayHeight) / 2);
 
 
-    spritebg.setScale(1);
+    //spritebg.setScale(1);
     // letterD.setScale(1)
     // posicionar numeros de dividendo y divisor
     positionNumbers(this, dividendo)
     ponerLineaYDivisor(this, divisor)
     //Crear caja informativa y flechas
     ejecutarPistaUno(context)
-
-    let prueba = 23
+    tryAgain = this.sound.add('tryAgain')
 
 }
 
@@ -213,6 +237,8 @@ function createOtherArrow(context, x, y, escala, parametros) {
 
         } else {
             //Give feedback about incorrect separation of digits
+            moverOjosYSignoInterrogacion()
+            tryAgain.play()
         }
 
     });
@@ -257,6 +283,7 @@ function generarNumeroAleatorio(max) {
 }
 
 function posicionarDividendo(context, valor, posX, posY) {
+    console.log(context.sys.game.config.width)
     const button = context.add.text(400, 300, valor, { fontSize: '32px', fill: '#fff', backgroundColor: 'transparent', color: 'red', cornerRadius: '20px' })
         .setInteractive({ cursor: 'pointer' })
         .on('pointerdown', () => {
@@ -427,11 +454,11 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
 function crearGloboInformacion(context, information, posX, posY, width, height, operacionAdicional) {
     // Create a rectangle representing the information bubble
     infoBubble = context.add.graphics();
-    infoBubble.fillStyle(0xffffff, 1).fillRoundedRect(posX, posY, width, height, 1).setInteractive()
+    infoBubble.fillStyle('transparent').fillRoundedRect(posX, posY, width, height, 3).setInteractive()
 
     group.add(infoBubble)
     //group.add(text)
-    const text = context.add.text(infoBubble.x, posY + 10, information, { fill: '#000000', backgroundColor: 'white' });
+    const text = context.add.text(posX, posY + 10, information, { fill: '#000000', backgroundColor: 'white', fontSize: 28 });
     group.add(text)
 
     // Animar el grupo para que se desplace hacia la izquierda
@@ -493,7 +520,7 @@ function ejecutarPistaUno(context) {
             index++
         }
     }
-    crearGloboInformacion(context, 'Primer paso.\nSepara los\ndigitos necesarios\ndel dividendo', 600, 100, 200, 80, operacionAdicional)
+    crearGloboInformacion(context, 'Primer paso.\nSepara los\ndigitos necesarios\ndel dividendo', 200, 50, 200, 80, operacionAdicional)
 
 }
 function comprobarCocienteParcialCorrecto(dividendoParcial, divisor, inputText) {
@@ -652,6 +679,76 @@ function ocultarFlechasPistaBajarNumero() {
     }).forEach(arrow => {
         arrow.visible = false
     });
+}
+
+function moverOjosYSignoInterrogacion() {
+    const circle = context.add.graphics();
+    const x1 = 1240;
+    const y1 = 450;
+    const radius = 50;
+
+    circle.fillStyle(0xffffff, 1);
+    circle.fillCircle(x1, y1, radius);
+
+    const circle2 = context.add.graphics();
+    const x2 = 1370;
+    const y2 = 430;
+    const radius2 = 50;
+
+    circle2.fillStyle(0xffffff, 1);
+    circle2.fillCircle(x2, y2, radius2);
+
+    const circle3 = context.add.graphics();
+    const x3 = 1370;
+    const y3 = 430;
+    const radius3 = 40;
+
+    circle3.fillStyle(0x000000, 1);
+    circle3.fillCircle(x3, y3, radius3);
+
+    const circle4 = context.add.graphics();
+    const x4 = 1240;
+    const y4 = 450;
+    const radius4 = 40;
+
+    circle4.fillStyle(0x000000, 1);
+    circle4.fillCircle(x4, y4, radius4);
+
+    // Create a tween to move the circle horizontally
+    if (true)
+        circle4.x = -50;
+    const tween = context.tweens.add({
+        targets: circle4,
+        x: 30, // Final x position
+        duration: 800, // Duration of the tween in milliseconds
+        ease: 'Linear', // Linear easing for constant speed
+        yoyo: true, // Yoyo effect to reverse the tween
+        repeat: 1 // Repeat indefinitely
+    });
+
+    // Create a tween to move the circle horizontally
+    if (true)
+        circle3.x = -35;
+    const tween2 = context.tweens.add({
+        targets: circle3,
+        x: 30, // Final x position
+        duration: 800, // Duration of the tween in milliseconds
+        ease: 'Linear', // Linear easing for constant speed
+        yoyo: true, // Yoyo effect to reverse the tween
+        repeat: 1 // Repeat indefinitely
+    });
+
+    const screenWidth = context.sys.game.config.width;
+    const screenHeight = context.sys.game.config.height;
+
+    // Add the background image
+    const bg = context.add.image(1200, 0, 'questionMark');
+
+    // Set the scale of the background image to fit the screen
+    bg.setScale(0.2);
+
+    // Set the background image origin to the top-left corner
+    bg.setOrigin(0, 0);
 }
 
 function TransformarFigura() {
