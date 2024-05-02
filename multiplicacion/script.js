@@ -81,8 +81,7 @@ function create() {
     //Set pointer displayed as hand when hovering
     [op1, op2, op3, op4, playImage].forEach(e => {
         e.setInteractive({ cursor: 'pointer' });
-    }
-    )
+    })
 
     sprite2 = this.add.image(300, 250, 'grid');
     sprite2.setScale(0.35)

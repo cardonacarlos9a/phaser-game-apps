@@ -38,6 +38,15 @@ function create() {
     context = this;
     //createRectangle()
     draggingTest()
+    this.add.text(window.innerWidth / 2, 20, 'Ángulos', { fontFamily: 'Bradley Hand', fontSize: 28, color: '#eeeeee' })
+    this.add.text(window.innerWidth / 3, 40, 'Selecciona el tipo de angulo correcto', { fontFamily: 'Bradley Hand', fontSize: 28, color: '#eeeeee' })
+
+    //Add CSS to remove border
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+    drawAngle()
+    drawHalveCircle()
+    draggingTest1()
 }
 
 function update() {
@@ -60,7 +69,7 @@ function createRectangle() {
 
 function draggingTest() {
     // Create a line
-    const line = new Phaser.Geom.Line(50, 50, 200, 100);
+    const line = new Phaser.Geom.Line(200, 100, 400, 100);
 
     // Draw the line
     const graphics = context.add.graphics();
@@ -99,3 +108,68 @@ function draggingTest() {
     });
 
 }
+
+function drawAngle() {
+    // Create a line
+    const line = new Phaser.Geom.Line(200, 300, 200, 100);
+
+    // Draw the line
+    const graphics = context.add.graphics();
+    graphics.lineStyle(2, 0xffffff); // Set line style
+    graphics.strokeLineShape(line); // Draw the line
+
+
+}
+
+function drawHalveCircle() {
+    const centerX = 200; // x-coordinate of the center of the circle
+    const centerY = 100; // y-coordinate of the center of the circle
+    const radius = 30; // radius of the circle
+    const startAngle = Phaser.Math.DegToRad(90); // start angle of the arc (180 degrees)
+    const endAngle = Phaser.Math.DegToRad(0); // end angle of the arc (0 degrees)
+    const anticlockwise = false; // draw the arc clockwise
+
+    const graphics = context.add.graphics();
+    graphics.lineStyle(2, 0xffffff); // Set line style
+    graphics.beginPath();
+    graphics.arc(centerX, centerY, radius, startAngle, endAngle, anticlockwise);
+    graphics.strokePath(); // Draw the path
+}
+
+function draggingTest1() {
+    // Define the initial coordinates of the line
+    let startX = 900;
+    let startY = 400;
+    let endX = 600;
+    let endY = 500;
+
+    // Draw the line
+    const graphics = context.add.graphics();
+    graphics.lineStyle(2, 0xffffff); // Set line style
+    graphics.beginPath();
+    graphics.moveTo(startX, startY); // Move to the start point
+    graphics.lineTo(endX, endY); // Draw a line to the end point
+    graphics.strokePath(); // Stroke the path
+
+    // Calculate the bounds of the line
+    const bounds = new Phaser.Geom.Rectangle(Math.min(startX, endX), Math.min(startY, endY), Math.abs(endX - startX), Math.abs(endY - startY));
+    // Enable input events on the line
+    graphics.setInteractive(bounds, Phaser.Geom.Rectangle.Contains);
+
+    // Add pointermove event listener to drag the line
+    graphics.on('pointermove', function (pointer, localX, localY, event) {
+        // Update the end point of the line
+        endX = pointer.x;
+        endY = pointer.y;
+
+        // Clear the graphics and redraw the line
+        graphics.clear();
+        graphics.lineStyle(2, 0xffffff);
+        graphics.beginPath();
+        graphics.moveTo(startX, startY); // Move to the start point
+        graphics.lineTo(endX, endY); // Draw a line to the end point
+        graphics.strokePath(); // Stroke the path
+    });
+}
+
+

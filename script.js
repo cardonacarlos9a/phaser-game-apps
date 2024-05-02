@@ -19,24 +19,37 @@ var config = {
         update: update
     }
 };
+
 var game = new Phaser.Game(config);
 let context;
+var bg;
+
 function preload() {
     this.load.image('bg', 'background.svg');
     this.load.image('division', 'division.webp');
+    this.load.image('gif', 'divide.gif')
 }
 function create() {
     context = this;
-    positionBackgroundImage()
+    // Add resize event listener
+    this.scale.on('resize', resizeBackground, context);
+
     // Position button that contains the item to navigate to game
-    positionItemButon(context.sys.game.config.width * 0.4, 200, '/division/index.html', 'Division')
-    positionItemButon(context.sys.game.config.width * 0.4, 400, '/multiplicacion/index.html', 'Multiplication')
+    bg = this.add.image(0, 0, 'bg').setOrigin(0);
+    
+    positionItemButon(context.sys.game.config.width * 0.2, 200, '/division/index.html', 'Division')
+    positionItemButon(context.sys.game.config.width * 0.4, 200, '/multiplicacion/index.html', 'Multiplication')
+    positionItemButon(context.sys.game.config.width * 0.6, 200, '/angulos/index.html', 'Angulos')
+
+    // Add CSS to remove border
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
 
 }
 
 
 function update() {
-    console.log(context.sys.game.config.width)
+    //console.log(context.sys.game.config.width)
 }
 function positionBackgroundImage() {
     // Get the size of the game canvas (screen)
@@ -44,7 +57,7 @@ function positionBackgroundImage() {
     const screenHeight = context.sys.game.config.height;
 
     // Add the background image
-    const bg = context.add.image(0, 0, 'bg');
+    bg = context.add.image(0, 0, 'bg');
 
     // Set the scale of the background image to fit the screen
     bg.setScale(screenWidth / bg.width, screenHeight / bg.height);
@@ -57,7 +70,7 @@ function positionBackgroundImage() {
  * Positions the button that we click at the initial screen to navigate to an app
  */
 function positionItemButon(posX, posY, navigationUrl, buttonText) {
-    defineScreenSize()
+    //defineScreenSize()
     // Create a graphics object
     const graphics = context.add.graphics();
 
@@ -74,7 +87,7 @@ function positionItemButon(posX, posY, navigationUrl, buttonText) {
 
     // Draw the rounded rectangle
     //graphics.strokeRoundedRect(x, y, width, height, radius);
-    graphics.fillRoundedRect(x, y, width, height, radius);
+    graphics.fillRoundedRect(x, y, width, height, 20);
 
     // Add the background image
     const backgroundImage = context.add.image(x, y, 'division');
@@ -123,14 +136,11 @@ function positionItemButon(posX, posY, navigationUrl, buttonText) {
     })
 }
 
-function defineScreenSize() {
-    console.log(context.sys.game.config.width, context.sys.game.config.height)
-
-    // Resize event listener
-    context.scale.on('resize', (gameSize) => {
-        // Adjust logo position and scale on resize
-        logo.x = gameSize.width / 2;
-        logo.y = gameSize.height / 2;
-        logo.setScale(gameSize.width / logo.width, gameSize.height / logo.height);
-    });
+function resizeBackground() {
+     // Calculate the scale factors to fit the background image to the screen
+     let scaleX = window.innerWidth / bg.width;
+     let scaleY = window.innerHeight / bg.height;
+ 
+     // Set the scale of the background image
+     bg.setScale(scaleX, scaleY);
 }

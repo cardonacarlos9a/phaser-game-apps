@@ -23,7 +23,7 @@ var game = new Phaser.Game(config);
 let infoBubble;
 let arrowGroup;
 const dividendo = generarNumeroAleatorio(10000000);
-const divisor = generarNumeroAleatorio(10);
+const divisor = generarNumeroAleatorio(100);
 let dividendoParcialGlobal = extraerDividendoParcial(dividendo);
 let context;
 //Grupo de globo de info con texto dentro
@@ -60,6 +60,7 @@ let tryAgain
 let screenWidth = 0
 let screenHeight = 0
 
+let spritebg;
 
 const inputStyle = {
     backgroundColor: '#ffffff',
@@ -87,23 +88,7 @@ function create() {
 
     spritebg = this.add.image(0, 0, 'bg');
     spritebg.setOrigin(0, 0)
-    // Calculate the aspect ratio of the image
-    const aspectRatio = spritebg.width / spritebg.height;
-    // Adjust the width and height to fit the screen while maintaining the aspect ratio
-    if (screenWidth / screenHeight > aspectRatio) {
-        // Screen is wider than the image
-        spritebg.setDisplaySize(screenHeight * aspectRatio, screenHeight);
-    } else {
-        // Screen is taller than the image
-        spritebg.setDisplaySize(screenWidth, screenWidth / aspectRatio);
-    }
 
-    // Center the image on the screen
-    spritebg.setPosition((screenWidth - spritebg.displayWidth) / 2, (screenHeight - spritebg.displayHeight) / 2);
-
-
-    //spritebg.setScale(1);
-    // letterD.setScale(1)
     // posicionar numeros de dividendo y divisor
     positionNumbers(this, dividendo)
     ponerLineaYDivisor(this, divisor)
@@ -111,6 +96,28 @@ function create() {
     ejecutarPistaUno(context)
     tryAgain = this.sound.add('tryAgain')
 
+    // Add CSS to remove border
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+
+    this.scale.on('resize', resizeBackground, context);
+
+}
+function update() {
+    //update pointer
+    //console.log(inputText.text)
+
+    // Keep the cursor blinking (optional)
+    /*const currentTime = this.time.now;
+    const cursorBlinkInterval = 500; // milliseconds
+    const cursorVisible = (currentTime % (2 * cursorBlinkInterval)) < cursorBlinkInterval;
+    const tempText = inputText?.text.substring(0, 1)
+    if (cursorVisible) {
+        inputText.setText(tempText+'|');
+    } else {
+        inputText.setText('h');
+        console.log(inputText.text)
+    }*/
 }
 
 function handleEnter(eveant) {
@@ -136,22 +143,6 @@ function handleTextInput(event) {
 
 }
 
-function update() {
-    //update pointer
-    //console.log(inputText.text)
-
-    // Keep the cursor blinking (optional)
-    /*const currentTime = this.time.now;
-    const cursorBlinkInterval = 500; // milliseconds
-    const cursorVisible = (currentTime % (2 * cursorBlinkInterval)) < cursorBlinkInterval;
-    //const tempText = inputText?.text.substring(0, 1)
-    if (cursorVisible) {
-        inputText.setText(tempText+'|');
-    } else {
-        inputText.setText('h');
-        //console.log(inputText.text)
-    }*/
-}
 function positionNumbers(context, dividendo) {
     let posX = -12
     for (const char of dividendo.toString()) {
@@ -293,6 +284,29 @@ function posicionarDividendo(context, valor, posX, posY) {
     // Set origin to center for proper positioning
     button.setOrigin(posX, posY);
 }
+function setBlink(auxCajaTexto) {
+    if (auxCajaTexto.getData('hasBlinkSet') != 'true') {
+        //Eliminar todos los intevalos excepto este
+        for (let index = 0; index < intervalIds.length; index++) {
+            clearInterval(intervalIds[index])
+        }
+        //auxCajaTexto.fillStyle({fontSize:'50'})
+        auxCajaTexto.text = '|'
+        auxCajaTexto.setStyle({ fontSize: '25px', color: "white" })
+        //console.log(auxCajaTexto)
+        let cursorVisible = true;
+        cursorBlinkIntervalId = setInterval(function () {
+            cursorVisible = !cursorVisible;
+            auxCajaTexto.setVisible(cursorVisible);
+        }, 500);
+        auxCajaTexto.setData('hasBlinkSet', 'true')
+        intervalIds.push(cursorBlinkIntervalId);
+    }
+}
+
+function removeBlink(auxCajaTexto) {
+
+}
 /**
  * Metodo para crear un input donde se va agregando los valores de cada paso de la division
  * @param {context} context 
@@ -303,6 +317,7 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
     let inputBackground = context.add.rectangle(1100, posY, width, height, 'orange').setData({ 'index': 'R' + index, 'tipo': tipo }).
         setInteractive({ cursor: 'pointer' })
         .on('pointerdown', function () {
+
             //global variable containing the index of the box that was clicked
             inputTextBoxClicked = inputBackground.getData('index')
             if (!keyDownEventHandler) {
@@ -312,27 +327,17 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
             let auxCajaTexto = context.children.getChildren().
                 find(element => element.getData('index') == 'texto' + inputTextBoxClicked);
 
+            inputBackground.setStyle({ fontSize: '25px', color: "blue" })
+
             //Find if the blink animation was already set on the box, otherwise dont set it
-            /* if (auxCajaTexto.getData('hasBlinkSet') != 'true') {
-                 //Eliminar todos los intevalos excepto este
-                 for (let index = 0; index < intervalIds.length; index++) {
-                     clearInterval(intervalIds[index])
-                 }
-                 //auxCajaTexto.fillStyle({fontSize:'50'})
-                 auxCajaTexto.text = '|'
-                 auxCajaTexto.setStyle({ fontSize: '25px', color: "white" })
-                 //console.log(auxCajaTexto)
-                 let cursorVisible = true;
-                 cursorBlinkIntervalId = setInterval(function () {
-                     cursorVisible = !cursorVisible;
-                     auxCajaTexto.setVisible(cursorVisible);
-                 }, 500);
-                 auxCajaTexto.setData('hasBlinkSet', 'true')
-                 intervalIds.push(cursorBlinkIntervalId);
-             }*/
+            //setBlink(auxCajaTexto)
         });
 
     function handleTextInputChange(event) {
+        // //Eliminar cursor
+        // for (let index = 0; index < intervalIds.length; index++) {
+        //     clearInterval(intervalIds[index])
+        // }
         // Rectangle
         let auxInputBackground = context.children.getChildren().
             find(element => element.getData('index') === inputTextBoxClicked);
@@ -341,6 +346,7 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
             find(element => element.getData('index') === 'texto' + inputTextBoxClicked);
 
         if (auxInputBackground?.getData('tipo') == 'cociente') {
+
             // si es un digito
             if (/^[0-9]$/.test(event.key)) {
                 let diviDendoParcial = dividendoParcialGlobal
@@ -370,6 +376,8 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                 cajaTexto.text = event.key
 
                 if (comprobarMultiplicacionParcialCorrecta()) {
+                    //auxInputBackground.setFillStyle()
+
                     ponerCajasResultadoMultiplicacion();
                     //Poner linea separadora para la resta
                     dibujarLineaResta(context, 635 + indicePosicionLineaResta * 40, posicionLineaRestaEjeY, determinarDigitosASeparar(dividendo, divisor))
@@ -752,4 +760,13 @@ function moverOjosYSignoInterrogacion() {
 }
 
 function TransformarFigura() {
+
+}
+function resizeBackground() {
+    // Calculate the scale factors to fit the background image to the screen
+    let scaleX = window.innerWidth / spritebg.width;
+    let scaleY = window.innerHeight / spritebg.height;
+
+    // Set the scale of the background image
+    spritebg.setScale(scaleX, scaleY);
 }
