@@ -16,6 +16,10 @@ var config = {
     },
     dom: {
         createContainer: true
+    }, 
+    scale: {
+        mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.CENTER_BOTH
     }
 };
 
@@ -60,7 +64,7 @@ let tryAgain
 let screenWidth = 0
 let screenHeight = 0
 
-let spritebg;
+var spritebg;
 
 const inputStyle = {
     backgroundColor: '#ffffff',
@@ -77,17 +81,14 @@ function preload() {
 }
 
 function create() {
+    context = this;
     //Initialize vars creation of groups
     group = this.add.group()
     arrowGroup = this.add.group();
     //initializacion del contexto
-    context = this;
-    // Get the width and height of the game screen
-    screenWidth = this.sys.game.config.width;
-    screenHeight = this.sys.game.config.height;
 
-    spritebg = this.add.image(0, 0, 'bg');
-    spritebg.setOrigin(0, 0)
+    spritebg = this.add.image(0, 0, 'bg').setOrigin(0);
+    this.scale.on('resize', resizeBackground, context);
 
     // posicionar numeros de dividendo y divisor
     positionNumbers(this, dividendo)
@@ -99,8 +100,6 @@ function create() {
     // Add CSS to remove border
     document.body.style.margin = '0';
     document.body.style.padding = '0';
-
-    this.scale.on('resize', resizeBackground, context);
 
 }
 function update() {
