@@ -40,6 +40,8 @@ function create() {
     positionItemButon(context.sys.game.config.width * 0.2, 200, '/division/index.html', 'Division')
     positionItemButon(context.sys.game.config.width * 0.4, 200, '/multiplicacion/index.html', 'Multiplication')
     positionItemButon(context.sys.game.config.width * 0.6, 200, '/angulos/index.html', 'Angulos')
+    positionItemButon(context.sys.game.config.width * 0.2, 400, 'https://local-learning-app.vercel.app/', 'Dict Mejorado')
+    positionItemButon(context.sys.game.config.width * 0.4, 400, 'https://play-ground-angular-teaching.vercel.app/', 'Generador')
 
     // Add CSS to remove border
     document.body.style.margin = '0';
