@@ -1,7 +1,7 @@
 var config = {
     type: Phaser.AUTO,
-    width: 2000,
-    height: 1300,
+    width: window.innerWidth,
+    height: window.innerHeight,
     physics: {
         default: 'arcade',
         arcade: {
@@ -20,7 +20,8 @@ var config = {
 };
 //Variables section
 var game = new Phaser.Game(config);
-let context;
+var context;
+
 
 const inputStyle = {
     backgroundColor: '#ffffff',
@@ -30,8 +31,8 @@ const inputStyle = {
 };
 
 function preload() {
-
-
+    //const 
+    this.load.image('tipos', 'Tipos-de-angulos.webp')
 }
 
 function create() {
@@ -44,9 +45,14 @@ function create() {
     //Add CSS to remove border
     document.body.style.margin = '0';
     document.body.style.padding = '0';
-    drawAngle()
+
     drawHalveCircle()
-    draggingTest1()
+    draggingTest1(this)
+
+    //Add tipe of angles image
+    const anglesTypeImage = this.add.image(700, 0, 'tipos').setOrigin(0).setScale(0.5);
+
+
 }
 
 function update() {
@@ -69,7 +75,9 @@ function createRectangle() {
 
 function draggingTest() {
     // Create a line
-    const line = new Phaser.Geom.Line(200, 100, 400, 100);
+    const line = new Phaser.Geom.Line(200, 300, 400, 300);
+    // Drws the vertical line
+    //drawAngle()
 
     // Draw the line
     const graphics = context.add.graphics();
@@ -112,7 +120,6 @@ function draggingTest() {
 function drawAngle() {
     // Create a line
     const line = new Phaser.Geom.Line(200, 300, 200, 100);
-
     // Draw the line
     const graphics = context.add.graphics();
     graphics.lineStyle(2, 0xffffff); // Set line style
@@ -136,16 +143,16 @@ function drawHalveCircle() {
     graphics.strokePath(); // Draw the path
 }
 
-function draggingTest1() {
+function draggingTest1(context) {
     // Define the initial coordinates of the line
-    let startX = 900;
-    let startY = 400;
-    let endX = 600;
-    let endY = 500;
+    let startX = 200;
+    let startY = 300;
+    let endX = 400;
+    let endY = 100;
 
     // Draw the line
     const graphics = context.add.graphics();
-    graphics.lineStyle(2, 0xffffff); // Set line style
+    graphics.lineStyle(3, 0xffffff); // Set line style
     graphics.beginPath();
     graphics.moveTo(startX, startY); // Move to the start point
     graphics.lineTo(endX, endY); // Draw a line to the end point
@@ -156,9 +163,18 @@ function draggingTest1() {
     // Enable input events on the line
     graphics.setInteractive(bounds, Phaser.Geom.Rectangle.Contains);
 
+    //Continuous tracking of pointer movement
+    context.input.on('pointermove', function (pointer) {
+        if (pointer.x < 210) {
+            endX = 100
+            console.log(endX)
+        }
+    });
+
     // Add pointermove event listener to drag the line
-    graphics.on('pointermove', function (pointer, localX, localY, event) {
+    context.input.on('pointermove', function (pointer, localX, localY, event) {
         // Update the end point of the line
+        
         endX = pointer.x;
         endY = pointer.y;
 
@@ -170,6 +186,7 @@ function draggingTest1() {
         graphics.lineTo(endX, endY); // Draw a line to the end point
         graphics.strokePath(); // Stroke the path
     });
+
 }
 
 
