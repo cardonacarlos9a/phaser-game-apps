@@ -10,8 +10,8 @@
 /* Style for the button */
 .button {
     position: absolute;
-    top: 10%;
-    left: 10%;
+    top: 5%;
+    left: 5%;
     transform: translate(-50%, -50%);
     background-color: #007bff;
     color: #fff;

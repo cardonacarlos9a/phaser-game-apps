@@ -22,6 +22,16 @@ var config = {
 var game = new Phaser.Game(config);
 var context;
 
+const AngleType = {
+    'AGUDO': 'Agudo',
+    RECTO: 'Recto',
+    OBTUSO: 'Obtuso',
+    LLANO: 'Llano',
+    CONCAVO: 'Concavo',
+    CONVEXO: 'Convexo',
+    PERIGONAL: 'Perigonal',
+    NULO: 'Nulo'
+};
 
 const inputStyle = {
     backgroundColor: '#ffffff',
@@ -31,14 +41,11 @@ const inputStyle = {
 };
 
 function preload() {
-    //const 
+    context = this
     this.load.image('tipos', 'Tipos-de-angulos.webp')
 }
 
 function create() {
-    context = this;
-    //createRectangle()
-    draggingTest()
     this.add.text(window.innerWidth / 2, 20, 'Ángulos', { fontFamily: 'Bradley Hand', fontSize: 28, color: '#eeeeee' })
     this.add.text(window.innerWidth / 3, 40, 'Selecciona el tipo de angulo correcto', { fontFamily: 'Bradley Hand', fontSize: 28, color: '#eeeeee' })
 
@@ -50,9 +57,10 @@ function create() {
     draggingTest1(this)
 
     //Add tipe of angles image
-    const anglesTypeImage = this.add.image(700, 0, 'tipos').setOrigin(0).setScale(0.5);
+    const anglesTypeImage = this.add.image(700, 100, 'tipos').setOrigin(0).setScale(0.5);
 
-
+    //
+    addCustomButtom(150, 50, null, null, 'Create Angle')
 }
 
 function update() {
@@ -73,50 +81,6 @@ function createRectangle() {
     });
 }
 
-function draggingTest() {
-    // Create a line
-    const line = new Phaser.Geom.Line(200, 300, 400, 300);
-    // Drws the vertical line
-    //drawAngle()
-
-    // Draw the line
-    const graphics = context.add.graphics();
-    graphics.lineStyle(2, 0xffffff); // Set line style
-    graphics.strokeLineShape(line); // Draw the line
-
-    // Enable input events on the line
-    graphics.setInteractive(new Phaser.Geom.Rectangle(line.x1, line.y1, line.length, 5), Phaser.Geom.Rectangle.Contains);
-
-    // Add pointerdown event listener to the line
-    graphics.on('pointerdown', function (pointer, localX, localY, event) {
-        // Start dragging only if the pointer is close to the draggable end of the line
-        const threshold = 10; // Adjust this threshold as needed
-        if (Phaser.Math.Distance.Between(pointer.x, pointer.y, line.x2, line.y2) < threshold) {
-            graphics.dragging = true;
-        }
-    });
-
-    // Add pointerup event listener to stop dragging
-    graphics.on('pointerup', function (pointer, localX, localY, event) {
-        graphics.dragging = false;
-    });
-
-    // Add pointermove event listener to drag the line
-    graphics.on('pointermove', function (pointer, localX, localY, event) {
-        if (graphics.dragging) {
-            // Update the position of the draggable end of the line
-            line.x2 = pointer.x;
-            line.y2 = pointer.y;
-
-            // Clear the graphics and redraw the line
-            graphics.clear();
-            graphics.lineStyle(2, 0xffffff);
-            graphics.strokeLineShape(line);
-        }
-    });
-
-}
-
 function drawAngle() {
     // Create a line
     const line = new Phaser.Geom.Line(200, 300, 200, 100);
@@ -124,8 +88,6 @@ function drawAngle() {
     const graphics = context.add.graphics();
     graphics.lineStyle(2, 0xffffff); // Set line style
     graphics.strokeLineShape(line); // Draw the line
-
-
 }
 
 function drawHalveCircle() {
@@ -143,7 +105,16 @@ function drawHalveCircle() {
     graphics.strokePath(); // Draw the path
 }
 
-function draggingTest1(context) {
+function draggingTest1() {
+
+    (_ => { // Creates the horizontal line
+        const line = new Phaser.Geom.Line(200, 300, 400, 300);
+        context.add.graphics()
+            .lineStyle(2, 0xffffff)
+            .strokeLineShape(line)
+    })();
+
+    const degrees = context.add.text(420, 280, '0°', { fontFamily: 'Bradley Hand', fontSize: 28, color: '#eeeeee' })
     // Define the initial coordinates of the line
     let startX = 200;
     let startY = 300;
@@ -162,30 +133,78 @@ function draggingTest1(context) {
     const bounds = new Phaser.Geom.Rectangle(Math.min(startX, endX), Math.min(startY, endY), Math.abs(endX - startX), Math.abs(endY - startY));
     // Enable input events on the line
     graphics.setInteractive(bounds, Phaser.Geom.Rectangle.Contains);
+    const updateLine = () => {
+        // Add pointermove event listener to drag the line
+        context.input.on('pointermove', function (pointer, localX, localY, event) {
 
-    //Continuous tracking of pointer movement
-    context.input.on('pointermove', function (pointer) {
-        if (pointer.x < 210) {
-            endX = 100
-            console.log(endX)
-        }
+
+            // Update the end point of the line
+            if (pointer.x <= 400 && pointer.y <= 500) {
+                endX = pointer.x;
+                endY = pointer.y;
+
+                // Calculate the angle between the fixed start point and the pointer position
+                const angle = Phaser.Math.Angle.Between(startX, startY, pointer.x, pointer.y);
+
+                // Convert the angle to degrees
+                let angleDegrees = Phaser.Math.RadToDeg(angle);
+                angleDegrees = (360 - angleDegrees) % 360;
+                angleDegrees = Math.floor(angleDegrees);
+
+                // Adjust the angle if needed to ensure it's within 0 to 360 degrees
+                // if (angleDegrees < 0) {
+                //     angleDegrees += 360;
+                // }
+                degrees.text = angleDegrees
+                //console.log("Angle in degrees (360 basis):", angleDegrees);
+
+            }
+            // Clear the graphics and redraw the line
+            graphics.clear();
+            graphics.lineStyle(2, 0xffffff);
+            graphics.beginPath();
+            graphics.moveTo(startX, startY); // Move to the start point
+            graphics.lineTo(endX, endY); // Draw a line to the end point
+            graphics.strokePath(); // Stroke the path
+        });
+    }
+
+    // Add pointermove event listener to update line direction
+    context.input.on('pointermove', updateLine);
+
+    // Add click event listener to stop line movement
+    context.input.on('pointerdown', function () {
+        // Remove the pointermove event listener
+        context.input.off('pointermove');
     });
+}
 
-    // Add pointermove event listener to drag the line
-    context.input.on('pointermove', function (pointer, localX, localY, event) {
-        // Update the end point of the line
-        
-        endX = pointer.x;
-        endY = pointer.y;
+function addCustomButtom(width, height, posX, posY, text) {
 
-        // Clear the graphics and redraw the line
-        graphics.clear();
-        graphics.lineStyle(2, 0xffffff);
-        graphics.beginPath();
-        graphics.moveTo(startX, startY); // Move to the start point
-        graphics.lineTo(endX, endY); // Draw a line to the end point
-        graphics.strokePath(); // Stroke the path
+    const defaultAtributes = {
+        width: 150,
+        height: 50,
+        posX: 100,
+        posY: 100
+    }
+
+    const button = context.add.sprite(posX ?? defaultAtributes.posX, posY ?? defaultAtributes.posY, 'tipos')
+        .setInteractive({ cursor: 'pointer' })
+
+    button.displayWidth = width ?? defaultAtributes.width
+    button.displayHeight = height ?? defaultAtributes.height;
+    // Create text for the button
+    const buttonText = context.add.text(button.x, button.y, text || 'Button Text', { fontFamily: 'Arial', fontSize: 20, color: '#aaaaaa' });
+    buttonText.setOrigin(0.5); // Center the text relative to the button
+
+    button.on('pointerdown', function () {
+        context.clearRect(0, 0, game.canvas.width, game.canvas.height);
+        draggingTest1()
     });
+}
+
+//Asks the user to draw an angle based on type provided as text
+function createGameOptionAngleCreation(){
 
 }
 
