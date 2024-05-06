@@ -21,6 +21,10 @@ var config = {
 //Variables section
 var game = new Phaser.Game(config);
 var context;
+var randomAngleType;
+let angleDegrees;
+var correct
+var sound
 
 const AngleType = {
     'AGUDO': 'Agudo',
@@ -43,9 +47,15 @@ const inputStyle = {
 function preload() {
     context = this
     this.load.image('tipos', 'Tipos-de-angulos.webp')
+    // Sound to tell correct or incorrect
+    this.load.audio('sound', ['../multiplicacion/sound.mp3'])
+    this.load.audio('correct', ['../multiplicacion/correct.mp3'])
 }
 
 function create() {
+    sound = this.sound.add('sound')
+    correct = this.sound.add('correct')
+
     this.add.text(window.innerWidth / 2, 20, 'Ángulos', { fontFamily: 'Bradley Hand', fontSize: 28, color: '#eeeeee' })
     this.add.text(window.innerWidth / 3, 40, 'Selecciona el tipo de angulo correcto', { fontFamily: 'Bradley Hand', fontSize: 28, color: '#eeeeee' })
 
@@ -57,10 +67,12 @@ function create() {
     draggingTest1(this)
 
     //Add tipe of angles image
-    const anglesTypeImage = this.add.image(700, 100, 'tipos').setOrigin(0).setScale(0.5);
+    //const anglesTypeImage = this.add.image(700, 100, 'tipos').setOrigin(0).setScale(0.5);
 
-    //
+    //Adds a button on the left to select game mode
     addCustomButtom(150, 50, null, null, 'Create Angle')
+
+    createGameOptionAngleCreation()
 }
 
 function update() {
@@ -147,16 +159,11 @@ function draggingTest1() {
                 const angle = Phaser.Math.Angle.Between(startX, startY, pointer.x, pointer.y);
 
                 // Convert the angle to degrees
-                let angleDegrees = Phaser.Math.RadToDeg(angle);
+                angleDegrees = Phaser.Math.RadToDeg(angle);
                 angleDegrees = (360 - angleDegrees) % 360;
                 angleDegrees = Math.floor(angleDegrees);
 
-                // Adjust the angle if needed to ensure it's within 0 to 360 degrees
-                // if (angleDegrees < 0) {
-                //     angleDegrees += 360;
-                // }
                 degrees.text = angleDegrees
-                //console.log("Angle in degrees (360 basis):", angleDegrees);
 
             }
             // Clear the graphics and redraw the line
@@ -176,6 +183,29 @@ function draggingTest1() {
     context.input.on('pointerdown', function () {
         // Remove the pointermove event listener
         context.input.off('pointermove');
+        console.log('hola')
+        if (randomAngleType == 'Recto' && angleDegrees == 90) {
+            console.log('congratulations')
+            correct.play()
+        } else if (randomAngleType == 'Agudo' && angleDegrees < 90 && angleDegrees > 0) {
+            correct.play()
+        } else if (randomAngleType == 'Obtuso' && angleDegrees > 90 && angleDegrees < 180) {
+            correct.play()
+
+        } else if (randomAngleType == 'Llano' && angleDegrees == 180) {
+            correct.play()
+
+        } else if (randomAngleType == AngleType.CONCAVO && angleDegrees > 180 && angleDegrees < 360) {
+            correct.play()
+
+        } else if (randomAngleType == AngleType.CONVEXO && angleDegrees > 0 && angleDegrees < 180) {
+            correct.play()
+
+        } else if (randomAngleType == AngleType.NULO && angleDegrees == 0) {
+            correct.play()
+        } else {
+            sound.play()
+        }
     });
 }
 
@@ -204,8 +234,16 @@ function addCustomButtom(width, height, posX, posY, text) {
 }
 
 //Asks the user to draw an angle based on type provided as text
-function createGameOptionAngleCreation(){
+function createGameOptionAngleCreation() {
+    // Convert object keys into an array
+    const angleTypeKeys = Object.keys(AngleType);
 
+    // Get a random index
+    const randomIndex = Math.floor(Math.random() * angleTypeKeys.length);
+
+    // Get the random angle type value
+    randomAngleType = AngleType[angleTypeKeys[randomIndex]];
+    context.add.text(200, 500, 'Crea un Angulo ' + randomAngleType, { fontFamily: 'Bradley Hand', fontSize: 28, color: '#eeeeee' })
 }
 
 
