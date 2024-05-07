@@ -153,7 +153,7 @@ function positionNumbers(context, dividendo) {
         // Set origin to center for proper positioning
         button.setOrigin(0.5, 0.5);
     };
-    let posX = context.sys.game.config.width / 3.1
+    let posX = context.sys.game.config.width / 5
     let posY = context.sys.game.config.height / 3.4
     for (const char of dividendo.toString()) {
         posicionarDividendo(context, char, posX += 40, posY)
@@ -168,7 +168,7 @@ function createOtherArrow(context, x, y, escala, parametros) {
     graphics.lineStyle(2, 0x00FF00, 1);
 
     const arrowX = x;
-    const arrowY = y;
+    const arrowY = y-60;
     const size = escala
     // Draw the arrow without filling
     const arrowPolygon = new Phaser.Geom.Polygon();
@@ -245,7 +245,7 @@ function createOtherArrow(context, x, y, escala, parametros) {
 
     context.tweens.add({
         targets: graphics,
-        y: 110, // Jump height
+        y: 30, // Jump height
         duration: 1000, // Duration of each jump in milliseconds
         yoyo: false, // Yoyo effect (return to the original position)
         repeat: 0 // times to repeat, -1 for
@@ -517,10 +517,10 @@ function determinarDigitosASeparar(dividendo, divisor) {
 //Pistas
 function ejecutarPistaUno(context) {
     const operacionAdicional = function () {
-        let posX = context.sys.game.config.width/3
+        let posX = context.sys.game.config.width/5 + 15
         let index = 1
         for (const _ of dividendo.toString()) {
-            const arrow = createOtherArrow(context, posX += 40, context.sys.game.config.height/9, 0.3)
+            const arrow = createOtherArrow(context, posX += 40, context.sys.game.config.height / 3.4, 0.3)
             //para saber el indice de la flecha
             arrow.setData('index', index)
             arrowGroup.add(arrow)
