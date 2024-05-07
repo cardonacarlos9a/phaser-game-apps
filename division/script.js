@@ -16,7 +16,7 @@ var config = {
     },
     dom: {
         createContainer: true
-    }, 
+    },
     scale: {
         mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH
@@ -85,7 +85,6 @@ function create() {
     //Initialize vars creation of groups
     group = this.add.group()
     arrowGroup = this.add.group();
-    //initializacion del contexto
 
     spritebg = this.add.image(0, 0, 'bg').setOrigin(0);
     this.scale.on('resize', resizeBackground, context);
@@ -141,14 +140,27 @@ function handleTextInput(event) {
     console.log(inputText.text)
 
 }
-
+//Metodo encargado de posicionar los numeros del dividendo
 function positionNumbers(context, dividendo) {
-    let posX = -12
+
+    const posicionarDividendo = (context, valor, posX, posY) => {
+        console.log(context.sys.game.config.width / 2)
+        const button = context.add.text(posX, posY, valor,
+            {
+                fontSize: '32px', fill: '#fff', backgroundColor: 'transparent',
+                color: 'red', cornerRadius: '20px'
+            })
+        // Set origin to center for proper positioning
+        button.setOrigin(0.5, 0.5);
+    };
+    let posX = context.sys.game.config.width / 3.1
+    let posY = context.sys.game.config.height / 3.4
     for (const char of dividendo.toString()) {
-        posicionarDividendo(context, char, posX -= 2, 2)
+        posicionarDividendo(context, char, posX += 40, posY)
+        console.log(char)
     }
 }
-//Parametros en caso de necesitar propiedades especificas
+//Parametros: en caso de necesitar propiedades especificas
 function createOtherArrow(context, x, y, escala, parametros) {
     const graphics = context.add.graphics()
 
@@ -178,9 +190,7 @@ function createOtherArrow(context, x, y, escala, parametros) {
     graphics.setInteractive(arrowPolygon, Phaser.Geom.Polygon.Contains);
     // Draw the initial border of the arrow
 
-
     graphics.on('pointerover', function () {
-
         this.fillStyle(0x00FF00, 1);
         graphics.fillPoints(arrowPolygon.points, true);
         game.canvas.style.cursor = 'pointer';
@@ -272,17 +282,7 @@ function generarNumeroAleatorio(max) {
     return Math.floor(Math.random() * max)
 }
 
-function posicionarDividendo(context, valor, posX, posY) {
-    console.log(context.sys.game.config.width)
-    const button = context.add.text(400, 300, valor, { fontSize: '32px', fill: '#fff', backgroundColor: 'transparent', color: 'red', cornerRadius: '20px' })
-        .setInteractive({ cursor: 'pointer' })
-        .on('pointerdown', () => {
-            // This function will be called when the button is clicked
-            window.location.href = 'http://127.0.0.1:5501/index.html'; // Replace with your desired URL
-        });
-    // Set origin to center for proper positioning
-    button.setOrigin(posX, posY);
-}
+
 function setBlink(auxCajaTexto) {
     if (auxCajaTexto.getData('hasBlinkSet') != 'true') {
         //Eliminar todos los intevalos excepto este
@@ -461,7 +461,7 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
 function crearGloboInformacion(context, information, posX, posY, width, height, operacionAdicional) {
     // Create a rectangle representing the information bubble
     infoBubble = context.add.graphics();
-    infoBubble.fillStyle('transparent').fillRoundedRect(posX, posY, width, height, 3).setInteractive()
+    //infoBubble.fillStyle('transparent').fillRoundedRect(posX, posY, width, height, 3).setInteractive()
 
     group.add(infoBubble)
     //group.add(text)
@@ -517,10 +517,10 @@ function determinarDigitosASeparar(dividendo, divisor) {
 //Pistas
 function ejecutarPistaUno(context) {
     const operacionAdicional = function () {
-        let posX = 665
+        let posX = context.sys.game.config.width/3
         let index = 1
         for (const _ of dividendo.toString()) {
-            const arrow = createOtherArrow(context, posX += 40, 100, 0.3)
+            const arrow = createOtherArrow(context, posX += 40, context.sys.game.config.height/9, 0.3)
             //para saber el indice de la flecha
             arrow.setData('index', index)
             arrowGroup.add(arrow)

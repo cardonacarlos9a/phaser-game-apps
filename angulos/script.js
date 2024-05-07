@@ -1,3 +1,6 @@
+
+import { speak, createText } from '../common/common.js'
+
 var config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
@@ -73,6 +76,8 @@ function create() {
     addCustomButtom(150, 50, null, null, 'Create Angle')
 
     createGameOptionAngleCreation()
+    speak("Bienvenido");
+    createText(context)
 }
 
 function update() {
