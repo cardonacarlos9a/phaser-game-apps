@@ -57,14 +57,19 @@ let numeroCajaCociente = 1
 //Indice para tener control sobre en que parte poner la linea separadora de la resta en el eje x
 let indicePosicionLineaResta = 1
 // Posicion para ubicar las lineas separadoras del resultado de resta en el eje y
-let posicionLineaRestaEjeY = 315
+let posicionLineaRestaEjeY = 72
 //Audio incorrecto
 let tryAgain
 // Get the width and height of the game screen
 let screenWidth = 0
 let screenHeight = 0
-
+//Some background
 var spritebg;
+
+const baseCoordinates = {
+    initialX: 0,
+    initialY: 0
+}
 
 const inputStyle = {
     backgroundColor: '#ffffff',
@@ -74,6 +79,12 @@ const inputStyle = {
 };
 
 function preload() {
+    context = this;
+
+    //Initialize screen size
+    baseCoordinates.initialX = context.sys.game.config.width / 5;
+    baseCoordinates.initialY = context.sys.game.config.height / 3.4;
+
     this.load.image('bg', 'bg.png');
     //this.load.image('letter-d', 'letter-d.png');
     this.load.image('questionMark', 'questionMark.svg');
@@ -81,7 +92,6 @@ function preload() {
 }
 
 function create() {
-    context = this;
     //Initialize vars creation of groups
     group = this.add.group()
     arrowGroup = this.add.group();
@@ -142,9 +152,7 @@ function handleTextInput(event) {
 }
 //Metodo encargado de posicionar los numeros del dividendo
 function positionNumbers(context, dividendo) {
-
     const posicionarDividendo = (context, valor, posX, posY) => {
-        console.log(context.sys.game.config.width / 2)
         const button = context.add.text(posX, posY, valor,
             {
                 fontSize: '32px', fill: '#fff', backgroundColor: 'transparent',
@@ -157,9 +165,9 @@ function positionNumbers(context, dividendo) {
     let posY = context.sys.game.config.height / 3.4
     for (const char of dividendo.toString()) {
         posicionarDividendo(context, char, posX += 40, posY)
-        console.log(char)
     }
 }
+
 //Parametros: en caso de necesitar propiedades especificas
 function createOtherArrow(context, x, y, escala, parametros) {
     const graphics = context.add.graphics()
@@ -168,7 +176,7 @@ function createOtherArrow(context, x, y, escala, parametros) {
     graphics.lineStyle(2, 0x00FF00, 1);
 
     const arrowX = x;
-    const arrowY = y-60;
+    const arrowY = y - 60;
     const size = escala
     // Draw the arrow without filling
     const arrowPolygon = new Phaser.Geom.Polygon();
@@ -227,9 +235,9 @@ function createOtherArrow(context, x, y, escala, parametros) {
             context.tweens.killTweensOf(this);
 
             //Creacion de caja cociente para ingreso de texto
-            crearCajaTexto(context, 980 + numeroCajaCociente * 40, 290, 30, 30, 'cociente')
+            crearCajaTexto(context, baseCoordinates.initialX + numeroCajaCociente * 40 + dividendo.toString().length * 40 + 40, baseCoordinates.initialY + 30, 30, 30, 'cociente')
+
             numeroCajaCociente++;
-            console.log(numeroCajaCociente)
             graphics.off('pointerover')
             graphics.off('pointerdown')
             //Avanzar el contador para apuntar hacia el siguiente digito del dividendo para bajarlo luego
@@ -255,8 +263,9 @@ function createOtherArrow(context, x, y, escala, parametros) {
 }
 
 function ponerLineaYDivisor(context, divisor) {
-    let initialX = 1000
-    let initialY = 220
+    console.log()
+    let initialX = context.sys.game.config.width / 5 + dividendo.toString().length * 40 + 40
+    let initialY = context.sys.game.config.height / 3.4
     const graphics = context.add.graphics({ fillStyle: { color: 0x0000ff } }).setInteractive()
 
     // Set line style (2px width, white color)
@@ -264,17 +273,18 @@ function ponerLineaYDivisor(context, divisor) {
 
     // Draw the arrow
     graphics.beginPath();
-    graphics.moveTo(initialX, initialY + 15); // Starting point
+    graphics.moveTo(initialX, initialY - 20); // Starting point
 
     // Draw arrow body
     //graphics.lineTo(100, 200);
-    graphics.lineTo(initialX, initialY + 50);
-    graphics.lineTo(initialX + 200, initialY + 50);
+    graphics.lineTo(initialX, initialY + 10);
+    graphics.lineTo(initialX + 100, initialY + 10);
 
     // Optional: Draw the outline of the arrow
     graphics.strokePath();
 
-    context.add.text(1010, 235, divisor, { fontSize: '32px' })
+    const _divisor = context.add.text(initialX + 25, initialY - 5, divisor, { fontSize: '32px' })
+    _divisor.setOrigin(0.5, 0.5)
 
 }
 
@@ -313,7 +323,7 @@ function removeBlink(auxCajaTexto) {
 function crearCajaTexto(context, posX, posY, width, height, tipo) {
     index++;
     // let cursorBlinkIntervalId; pendiente implementar
-    let inputBackground = context.add.rectangle(1100, posY, width, height, 'orange').setData({ 'index': 'R' + index, 'tipo': tipo }).
+    let inputBackground = context.add.rectangle(context.sys.game.config.width / 5, posY, width, height, 'orange').setData({ 'index': 'R' + index, 'tipo': tipo }).
         setInteractive({ cursor: 'pointer' })
         .on('pointerdown', function () {
 
@@ -325,8 +335,6 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
             }
             let auxCajaTexto = context.children.getChildren().
                 find(element => element.getData('index') == 'texto' + inputTextBoxClicked);
-
-            inputBackground.setStyle({ fontSize: '25px', color: "blue" })
 
             //Find if the blink animation was already set on the box, otherwise dont set it
             //setBlink(auxCajaTexto)
@@ -379,10 +387,10 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
 
                     ponerCajasResultadoMultiplicacion();
                     //Poner linea separadora para la resta
-                    dibujarLineaResta(context, 635 + indicePosicionLineaResta * 40, posicionLineaRestaEjeY, determinarDigitosASeparar(dividendo, divisor))
+                    dibujarLineaResta(context, baseCoordinates.initialX + indicePosicionLineaResta * 40, baseCoordinates.initialY + posicionLineaRestaEjeY, determinarDigitosASeparar(dividendo, divisor))
                     indicePosicionLineaResta++;
                     // Posicion en el eje y que incrementa para posicionar la siguiente linea de resta
-                    posicionLineaRestaEjeY += 96
+                    posicionLineaRestaEjeY += 85
 
                 }
             }
@@ -410,7 +418,7 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     dividendoParcialGlobal = dividendoParcialGlobal.toString() + event.key
                     console.log('nuevo dividendo parcial global: ' + dividendoParcialGlobal)
                     //poner caja cociente
-                    crearCajaTexto(context, 980 + numeroCajaCociente * 40, 290, 30, 30, 'cociente')
+                    crearCajaTexto(context, baseCoordinates.initialX + numeroCajaCociente * 40 + dividendo.toString().length * 40 + 40, baseCoordinates.initialY + 30, 30, 30, 'cociente')
                     indiceFilasX++;
                     // incrementa el indice para indicar que puso uno nueva caja en el cociente
                     numeroCajaCociente++;
@@ -517,7 +525,7 @@ function determinarDigitosASeparar(dividendo, divisor) {
 //Pistas
 function ejecutarPistaUno(context) {
     const operacionAdicional = function () {
-        let posX = context.sys.game.config.width/5 + 15
+        let posX = context.sys.game.config.width / 5 + 15
         let index = 1
         for (const _ of dividendo.toString()) {
             const arrow = createOtherArrow(context, posX += 40, context.sys.game.config.height / 3.4, 0.3)
@@ -546,11 +554,11 @@ function ponerCajasResta() {
     //poner caja resta auxiliar
     const cantidadDigitosSeparados = dividendoParcialGlobal.toString().length
     // Falta definir en que nivel de x se va a poner
-    let posX = 730 + (indiceFilasX - 1) * 40
+    let posX = baseCoordinates.initialX + siguienteDigitoDividendo * 40 
 
     Array.from({ length: cantidadDigitosSeparados }, (_) => {
         // Your loop body code here
-        crearCajaTexto(context, posX -= 40, 250 + lineaEspaciadora + indiceColumnasY * 40, 30, 30, 'auxiliarMultiplicacion')
+        crearCajaTexto(context, posX -= 40, baseCoordinates.initialY + lineaEspaciadora + indiceColumnasY * 40, 30, 30, 'auxiliarMultiplicacion')
     });
     indiceColumnasY++;
     lineaEspaciadora += 15;
@@ -567,15 +575,13 @@ function dibujarLineaResta(context, posX, posY, length) {
 
     // Draw the arrow
     graphics.beginPath();
-    graphics.moveTo(initialX, initialY); // Starting point
+    graphics.moveTo(initialX, initialY+10); // Starting point
 
     // Draw arrow body
     //graphics.lineTo(100, 200);
-    graphics.lineTo(initialX + 37 * length, initialY);
-
+    graphics.lineTo(initialX + 37 * length, initialY+10);
     // Optional: Draw the outline of the arrow
     graphics.strokePath();
-
 }
 
 //Metodo que comprueba si la multiplicacion puesta en las cajas auxiliares es correcta, 
@@ -614,11 +620,11 @@ function comprobarMultiplicacionParcialCorrecta() {
 function ponerCajasResultadoMultiplicacion() {
     //poner caja resta auxiliar
     const cantidadDigitosSeparados = determinarDigitosASeparar(dividendo, divisor);
-    let posX = 730 + (indiceFilasX - 1) * 40
+    let posX = baseCoordinates.initialX + siguienteDigitoDividendo * 40
 
     Array.from({ length: cantidadDigitosSeparados }, (_) => {
         // Your loop body code here
-        crearCajaTexto(context, posX -= 40, 250 + lineaEspaciadora + indiceColumnasY * 40, 30, 30, 'auxiliarResta')
+        crearCajaTexto(context, posX -= 40, baseCoordinates.initialY + lineaEspaciadora + indiceColumnasY * 40, 30, 30, 'auxiliarResta')
     });
     //indiceColumnasY++;
 }
@@ -659,8 +665,8 @@ function pistaBajarSiguienteDigito() {
     flechaPistaBajarDigito.setData('tipo', 'flechaBajarDigito')
 
     // crear siguiente caja donde se pondra el digito bajado
-    let posX = 730 + (indiceFilasX - 1) * 40
-    crearCajaTexto(context, posX, 250 + lineaEspaciadora + indiceColumnasY * 40, 30, 30, 'digitoBajado')
+    let posX = baseCoordinates.initialX +  siguienteDigitoDividendo*40
+    crearCajaTexto(context, posX, baseCoordinates.initialY + lineaEspaciadora + indiceColumnasY * 40, 30, 30, 'digitoBajado')
     indiceColumnasY++
     //poner siguiente globo informativo
 }
