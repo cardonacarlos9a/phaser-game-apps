@@ -65,7 +65,9 @@ let screenWidth = 0
 let screenHeight = 0
 //Some background
 var spritebg;
+var text
 
+//Object have a reference for the global position of all elements in division
 const baseCoordinates = {
     initialX: 0,
     initialY: 0
@@ -80,10 +82,16 @@ const inputStyle = {
 
 function preload() {
     context = this;
+    if (context.sys.game.config.width < 500) {
+        //Initialize screen size
+        baseCoordinates.initialX = 1;
+        baseCoordinates.initialY = context.sys.game.config.height / 10;
+    } else {
+        baseCoordinates.initialX = context.sys.game.config.width / 5;
+        baseCoordinates.initialY = context.sys.game.config.height / 3.4;
 
-    //Initialize screen size
-    baseCoordinates.initialX = context.sys.game.config.width / 5;
-    baseCoordinates.initialY = context.sys.game.config.height / 3.4;
+    }
+
 
     this.load.image('bg', 'bg.png');
     //this.load.image('letter-d', 'letter-d.png');
@@ -112,9 +120,6 @@ function create() {
 
 }
 function update() {
-    //update pointer
-    //console.log(inputText.text)
-
     // Keep the cursor blinking (optional)
     /*const currentTime = this.time.now;
     const cursorBlinkInterval = 500; // milliseconds
@@ -161,13 +166,14 @@ function positionNumbers(context, dividendo) {
         // Set origin to center for proper positioning
         button.setOrigin(0.5, 0.5);
     };
-    let posX = context.sys.game.config.width / 5
-    let posY = context.sys.game.config.height / 3.4
+    let posX = baseCoordinates.initialX
+    let posY = baseCoordinates.initialY
     for (const char of dividendo.toString()) {
         posicionarDividendo(context, char, posX += 40, posY)
     }
 }
-
+//Handles the creation of the arrow for digit separation and calls 
+// function to create the cocient cocient boxes
 //Parametros: en caso de necesitar propiedades especificas
 function createOtherArrow(context, x, y, escala, parametros) {
     const graphics = context.add.graphics()
@@ -197,6 +203,8 @@ function createOtherArrow(context, x, y, escala, parametros) {
     // Add interactive events
     graphics.setInteractive(arrowPolygon, Phaser.Geom.Polygon.Contains);
     // Draw the initial border of the arrow
+
+    //arrowPolygon.setOrigin(0.5,0.5)
 
     graphics.on('pointerover', function () {
         this.fillStyle(0x00FF00, 1);
@@ -236,6 +244,8 @@ function createOtherArrow(context, x, y, escala, parametros) {
 
             //Creacion de caja cociente para ingreso de texto
             crearCajaTexto(context, baseCoordinates.initialX + numeroCajaCociente * 40 + dividendo.toString().length * 40 + 40, baseCoordinates.initialY + 30, 30, 30, 'cociente')
+            //TODO - Poner siguiente pista para buscar el primer digito del cociente
+            crearGloboInformacion(context, 'Siguiente paso.\nSepara los\ndigitos necesarios\ndel dividendo', 500, 50, 350, 150)
 
             numeroCajaCociente++;
             graphics.off('pointerover')
@@ -263,9 +273,8 @@ function createOtherArrow(context, x, y, escala, parametros) {
 }
 
 function ponerLineaYDivisor(context, divisor) {
-    console.log()
-    let initialX = context.sys.game.config.width / 5 + dividendo.toString().length * 40 + 40
-    let initialY = context.sys.game.config.height / 3.4
+    let initialX = baseCoordinates.initialX + dividendo.toString().length * 40 + 40
+    let initialY = baseCoordinates.initialY
     const graphics = context.add.graphics({ fillStyle: { color: 0x0000ff } }).setInteractive()
 
     // Set line style (2px width, white color)
@@ -373,6 +382,7 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     context.input.keyboard.off('keydown', handleTextInputChange, context);
                     keyDownEventHandler = false
                     ultimoDigitoCociente = cajaTexto.text
+                    //Poner pista de 
                 }
             } else {
                 console.log("recuerda que solo puedes ingresar numeros")
@@ -469,31 +479,45 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
 function crearGloboInformacion(context, information, posX, posY, width, height, operacionAdicional) {
     // Create a rectangle representing the information bubble
     infoBubble = context.add.graphics();
-    //infoBubble.fillStyle('transparent').fillRoundedRect(posX, posY, width, height, 3).setInteractive()
+    infoBubble.fillStyle(0xffffff).fillRoundedRect(posX, posY, width, height, 20).setInteractive();
+    // Draw the speech bubble pointer
+    infoBubble.lineStyle(2, 0xffffff); // White outline
+    infoBubble.beginPath();
+    infoBubble.moveTo(posX + width / 2 - 10, posY + height); // Start at the bottom center
+    infoBubble.lineTo(posX + width / 2 + 10, posY + height); // Draw a line to the right
+    infoBubble.lineTo(posX + width / 2 + 20, posY + height + 30); // Draw a line back to the bottom center
+    infoBubble.closePath();
+    infoBubble.fillPath(0xffffff); // Fill the pointer with white color
+    //console.log(infoBubble.width)
 
-    group.add(infoBubble)
-    //group.add(text)
-    const text = context.add.text(posX, posY + 10, information, { fill: '#000000', backgroundColor: 'white', fontSize: 28 });
-    group.add(text)
+    const text = context.add.text(posX, posY, information, { fill: '#000000', fontSize: 28 });
+    //text.setOrigin(0.5)
+    group = context.add.group(); // Create a Phaser group
 
-    // Animar el grupo para que se desplace hacia la izquierda
+    group.addMultiple(infoBubble); // Add both the infoBubble and text to the group
+    group.addMultiple(text); // Add both the infoBubble and text to the group
+
+    // Animate the group to move to the left
     context.tweens.add({
-        targets: infoBubble,
-        x: posX, // Mover hacia la izquierda en el eje x
+        targets: infoBubble, // Target the entire group
+        x: 500, // Move to the left on the x-axis
         ease: 'Cubic.InOut',
-        duration: 2000,
-        onUpdate: function (tween) {
-            // Sincronizar la posición del texto con el grupo
-            text.x = infoBubble.x + 550;
+        duration: 1000,
+        onUpdate: function () {
+            // Update the position of the text relative to the group
+            text.x = infoBubble.x + posX + 20
+
         },
         onComplete: function () {
-            if (operacionAdicional != null && operacionAdicional != undefined) {
-                operacionAdicional()
+
+            if (operacionAdicional) {
+                operacionAdicional();
+
             }
         }
     });
-
 }
+
 // metodo que devuelve la cantidad de digitos iniciales que se deben separar del dividendo
 function determinarDigitosASeparar(dividendo, divisor) {
     // Convertir los números a cadenas para facilitar la manipulación de dígitos
@@ -525,19 +549,19 @@ function determinarDigitosASeparar(dividendo, divisor) {
 //Pistas
 function ejecutarPistaUno(context) {
     const operacionAdicional = function () {
-        let posX = context.sys.game.config.width / 5 + 15
+        let posX = baseCoordinates.initialX + 15
         let index = 1
         for (const _ of dividendo.toString()) {
-            const arrow = createOtherArrow(context, posX += 40, context.sys.game.config.height / 3.4, 0.3)
+            const arrow = createOtherArrow(context, posX += 40, baseCoordinates.initialY, 0.3)
             //para saber el indice de la flecha
             arrow.setData('index', index)
             arrowGroup.add(arrow)
             index++
         }
     }
-    crearGloboInformacion(context, 'Primer paso.\nSepara los\ndigitos necesarios\ndel dividendo', 200, 50, 200, 80, operacionAdicional)
-
+    crearGloboInformacion(context, 'Primer paso.\nSepara los\ndigitos necesarios\ndel dividendo', 500, 50, 350, 150, operacionAdicional)
 }
+
 function comprobarCocienteParcialCorrecto(dividendoParcial, divisor, inputText) {
     let cocienteParcial = Math.floor(dividendoParcial / divisor)
     if (cocienteParcial == parseInt(inputText?.text)) {
@@ -554,7 +578,7 @@ function ponerCajasResta() {
     //poner caja resta auxiliar
     const cantidadDigitosSeparados = dividendoParcialGlobal.toString().length
     // Falta definir en que nivel de x se va a poner
-    let posX = baseCoordinates.initialX + siguienteDigitoDividendo * 40 
+    let posX = baseCoordinates.initialX + siguienteDigitoDividendo * 40
 
     Array.from({ length: cantidadDigitosSeparados }, (_) => {
         // Your loop body code here
@@ -575,11 +599,11 @@ function dibujarLineaResta(context, posX, posY, length) {
 
     // Draw the arrow
     graphics.beginPath();
-    graphics.moveTo(initialX, initialY+10); // Starting point
+    graphics.moveTo(initialX, initialY + 10); // Starting point
 
     // Draw arrow body
     //graphics.lineTo(100, 200);
-    graphics.lineTo(initialX + 37 * length, initialY+10);
+    graphics.lineTo(initialX + 37 * length, initialY + 10);
     // Optional: Draw the outline of the arrow
     graphics.strokePath();
 }
@@ -661,11 +685,11 @@ function pistaBajarSiguienteDigito() {
     context.children.getChildren().find(element => element.getData('index') === determinarDigitosASeparar(dividendo, divisor)).visible = false
 
     // localizar posicion del digito sobre el que se pondra la flecha y poner flecha
-    let flechaPistaBajarDigito = createOtherArrow(context, 645 + 40 * siguienteDigitoDividendo, 170, 0.5, { 'altura': 3 })
+    let flechaPistaBajarDigito = createOtherArrow(context, baseCoordinates.initialX - 5 + 40 * siguienteDigitoDividendo, baseCoordinates.initialY + 50, 0.5, { 'altura': 3 })
     flechaPistaBajarDigito.setData('tipo', 'flechaBajarDigito')
 
     // crear siguiente caja donde se pondra el digito bajado
-    let posX = baseCoordinates.initialX +  siguienteDigitoDividendo*40
+    let posX = baseCoordinates.initialX + siguienteDigitoDividendo * 40
     crearCajaTexto(context, posX, baseCoordinates.initialY + lineaEspaciadora + indiceColumnasY * 40, 30, 30, 'digitoBajado')
     indiceColumnasY++
     //poner siguiente globo informativo
