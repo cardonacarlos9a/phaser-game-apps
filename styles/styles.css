@@ -18,11 +18,18 @@
     padding: 10px 20px;
     border: none;
     cursor: pointer;
-    z-index: 2; /* Ensure the button appears above other content */
+    z-index: 2;
+    /* Ensure the button appears above other content */
 }
 
 /* Style for the content */
 .content {
     position: relative;
-    z-index: 1; /* Ensure the content appears below the button */
+    z-index: 1;
+    /* Ensure the content appears below the button */
+}
+
+body {
+    margin: 0;
+    padding: 0;
 }

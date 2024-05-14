@@ -57,7 +57,7 @@ let numeroCajaCociente = 1
 //Indice para tener control sobre en que parte poner la linea separadora de la resta en el eje x
 let indicePosicionLineaResta = 1
 // Posicion para ubicar las lineas separadoras del resultado de resta en el eje y
-let posicionLineaRestaEjeY = 72
+let posicionLineaRestaEjeY = 67.5
 //Audio incorrecto
 let tryAgain
 // Get the width and height of the game screen
@@ -83,28 +83,28 @@ const inputStyle = {
 function preload() {
     context = this;
     if (context.sys.game.config.width < 500) {
-        //Initialize screen size
+        //Initialize screen size for small screens
         baseCoordinates.initialX = 1;
         baseCoordinates.initialY = context.sys.game.config.height / 10;
     } else {
         baseCoordinates.initialX = context.sys.game.config.width / 5;
         baseCoordinates.initialY = context.sys.game.config.height / 3.4;
-
     }
-
 
     this.load.image('bg', 'bg.png');
     //this.load.image('letter-d', 'letter-d.png');
     this.load.image('questionMark', 'questionMark.svg');
     this.load.audio('tryAgain', ['ohno.mp3'])
+    console.log(window.innerHeight, context.sys.game.config.height)
 }
 
 function create() {
+    spritebg = this.add.image(0, 0, 'bg').setOrigin(0);
+    spritebg.setScale(config.width / spritebg.width, config.height / spritebg.height)
     //Initialize vars creation of groups
     group = this.add.group()
     arrowGroup = this.add.group();
 
-    spritebg = this.add.image(0, 0, 'bg').setOrigin(0);
     this.scale.on('resize', resizeBackground, context);
 
     // posicionar numeros de dividendo y divisor
@@ -113,12 +113,8 @@ function create() {
     //Crear caja informativa y flechas
     ejecutarPistaUno(context)
     tryAgain = this.sound.add('tryAgain')
-
-    // Add CSS to remove border
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-
 }
+
 function update() {
     // Keep the cursor blinking (optional)
     /*const currentTime = this.time.now;
@@ -242,10 +238,13 @@ function createOtherArrow(context, x, y, escala, parametros) {
             this.visible = true;
             context.tweens.killTweensOf(this);
 
-            //Creacion de caja cociente para ingreso de texto
-            crearCajaTexto(context, baseCoordinates.initialX + numeroCajaCociente * 40 + dividendo.toString().length * 40 + 40, baseCoordinates.initialY + 30, 30, 30, 'cociente')
+            text.setVisible(false)
+            infoBubble.setVisible(false)
             //TODO - Poner siguiente pista para buscar el primer digito del cociente
-            crearGloboInformacion(context, 'Siguiente paso.\nSepara los\ndigitos necesarios\ndel dividendo', 500, 50, 350, 150)
+            crearGloboInformacion(context, 'Ahora busca el\nprimer digito\ndel cociente', 500, 50, 350, 150)
+            
+            //Creacion de caja cociente para ingreso de texto
+            crearCajaTexto(context, baseCoordinates.initialX + numeroCajaCociente * 40 + dividendo.toString().length * 40 + 40, baseCoordinates.initialY + 30, 30, 20, 'cociente')
 
             numeroCajaCociente++;
             graphics.off('pointerover')
@@ -374,9 +373,12 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     auxInputBackground.off('pointerdown')
                     auxInputBackground.setInteractive({ cursor: 'default' })
                     //ocultar globo anterior y Generar globo de informacion para multiplicacion
-                    group.setVisible(false)
-                    crearGloboInformacion(context, "Ahora multiplica el numero que encontraste\npor el divisor y lo ubicas en las cajas\n"
-                        + "negras para realizar la resta", 500, 100, 500, 100)
+                    //group.setVisible(false)
+                    infoBubble.setVisible(false)
+                    text.setVisible(false)
+
+                    crearGloboInformacion(context, "Ahora multiplica el numero\n que encontraste por el\ndivisor y lo ubicas en las\n cajas"
+                        + " negras para realizar\n la resta", 500, 100, 500, 150)
                     //Poner cajas resta y estructura
                     ponerCajasResta()
                     context.input.keyboard.off('keydown', handleTextInputChange, context);
@@ -394,13 +396,17 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
 
                 if (comprobarMultiplicacionParcialCorrecta()) {
                     //auxInputBackground.setFillStyle()
+                    //Poner linea separadora para la resta
+                    dibujarLineaResta(context, baseCoordinates.initialX + indicePosicionLineaResta * 30, baseCoordinates.initialY + posicionLineaRestaEjeY, determinarDigitosASeparar(dividendo, divisor) * 37)
+                    // Posicion en el eje y que incrementa para posicionar la siguiente linea de resta
+                    posicionLineaRestaEjeY += 95
+                    indicePosicionLineaResta++;
 
                     ponerCajasResultadoMultiplicacion();
-                    //Poner linea separadora para la resta
-                    dibujarLineaResta(context, baseCoordinates.initialX + indicePosicionLineaResta * 40, baseCoordinates.initialY + posicionLineaRestaEjeY, determinarDigitosASeparar(dividendo, divisor))
-                    indicePosicionLineaResta++;
-                    // Posicion en el eje y que incrementa para posicionar la siguiente linea de resta
-                    posicionLineaRestaEjeY += 85
+                    
+                    infoBubble.setVisible(false)
+                    text.setVisible(false)
+                    crearGloboInformacion(context, "A continuacion realiza\n la resta", 500, 100, 500, 60)
 
                 }
             }
@@ -413,6 +419,10 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                 console.log('siguienteDigitoDividendo: ' + siguienteDigitoDividendo, 'dividendo: ' + dividendo.toString().length)
                 if (comprobarRestaCorrecta() && siguienteDigitoDividendo <= dividendo.toString().length) {
                     pistaBajarSiguienteDigito()
+
+                    infoBubble.setVisible(false)
+                    text.setVisible(false)
+                    crearGloboInformacion(context, "Ahora baja el digito que te\n indica la flecha", 500, 100, 500, 60)
 
                 }
 
@@ -434,6 +444,12 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     numeroCajaCociente++;
                     //ocultar flecha de la pista del numero a bajar
                     ocultarFlechasPistaBajarNumero()
+                    
+                    //
+                    infoBubble.setVisible(false)
+                    text.setVisible(false)
+                    crearGloboInformacion(context, "Continua completando\n el cociente", 500, 100, 500, 60)
+
                 }
             }
 
@@ -489,8 +505,10 @@ function crearGloboInformacion(context, information, posX, posY, width, height, 
     infoBubble.closePath();
     infoBubble.fillPath(0xffffff); // Fill the pointer with white color
     //console.log(infoBubble.width)
+    infoBubble.setVisible(true)
 
-    const text = context.add.text(posX, posY, information, { fill: '#000000', fontSize: 28 });
+    text = context.add.text(posX, posY, information, { fill: '#000000', fontSize: 28 });
+    text.setVisible(true)
     //text.setOrigin(0.5)
     group = context.add.group(); // Create a Phaser group
 
@@ -500,7 +518,7 @@ function crearGloboInformacion(context, information, posX, posY, width, height, 
     // Animate the group to move to the left
     context.tweens.add({
         targets: infoBubble, // Target the entire group
-        x: 500, // Move to the left on the x-axis
+        x: 350, // Move to the left on the x-axis
         ease: 'Cubic.InOut',
         duration: 1000,
         onUpdate: function () {
@@ -509,7 +527,6 @@ function crearGloboInformacion(context, information, posX, posY, width, height, 
 
         },
         onComplete: function () {
-
             if (operacionAdicional) {
                 operacionAdicional();
 
@@ -559,7 +576,7 @@ function ejecutarPistaUno(context) {
             index++
         }
     }
-    crearGloboInformacion(context, 'Primer paso.\nSepara los\ndigitos necesarios\ndel dividendo', 500, 50, 350, 150, operacionAdicional)
+    crearGloboInformacion(context, 'Primer paso.\nSepara los\ndigitos necesarios\ndel dividendo', baseCoordinates.initialX, 5, 350, 150, operacionAdicional)
 }
 
 function comprobarCocienteParcialCorrecto(dividendoParcial, divisor, inputText) {
@@ -599,11 +616,11 @@ function dibujarLineaResta(context, posX, posY, length) {
 
     // Draw the arrow
     graphics.beginPath();
-    graphics.moveTo(initialX, initialY + 10); // Starting point
+    graphics.moveTo(initialX, initialY); // Starting point
 
     // Draw arrow body
     //graphics.lineTo(100, 200);
-    graphics.lineTo(initialX + 37 * length, initialY + 10);
+    graphics.lineTo(initialX + length, initialY);
     // Optional: Draw the outline of the arrow
     graphics.strokePath();
 }
@@ -792,10 +809,13 @@ function TransformarFigura() {
 
 }
 function resizeBackground() {
+    console.log(window.innerWidth, context.sys.game.config.width)
+
     // Calculate the scale factors to fit the background image to the screen
     let scaleX = window.innerWidth / spritebg.width;
     let scaleY = window.innerHeight / spritebg.height;
 
     // Set the scale of the background image
     spritebg.setScale(scaleX, scaleY);
+
 }

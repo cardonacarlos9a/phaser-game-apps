@@ -1,6 +1,25 @@
 
 import { speak, createText } from '../common/common.js'
 
+// Define the new scene
+class NewScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'NewScene' });
+    }
+
+    preload() {
+        // Preload assets for the new scene
+    }
+
+    create() {
+        // Create objects for the new scene
+    }
+
+    update() {
+        // Update logic for the new scene
+    }
+}
+
 var config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
@@ -8,19 +27,23 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300 },
+            gravity: { y: 300   },
             debug: false
         }
     },
-    scene: {
+    scene: [{
         preload: preload,
         create: create,
         update: update
-    },
+    }, NewScene],
     dom: {
         createContainer: true
     }
 };
+
+
+
+
 //Variables section
 var game = new Phaser.Game(config);
 var context;
@@ -61,10 +84,6 @@ function create() {
 
     this.add.text(window.innerWidth / 2, 20, 'Ángulos', { fontFamily: 'Bradley Hand', fontSize: 28, color: '#eeeeee' })
     this.add.text(window.innerWidth / 3, 40, 'Selecciona el tipo de angulo correcto', { fontFamily: 'Bradley Hand', fontSize: 28, color: '#eeeeee' })
-
-    //Add CSS to remove border
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
 
     drawHalveCircle()
     draggingTest1(this)
@@ -192,12 +211,12 @@ function draggingTest1() {
         if (randomAngleType == 'Recto' && angleDegrees == 90) {
             console.log('congratulations')
             correct.play()
-        } else if (randomAngleType == 'Agudo' && angleDegrees < 90 && angleDegrees > 0) {
+        } else if (randomAngleType == AngleType.AGUDO && angleDegrees < 90 && angleDegrees > 0) {
             correct.play()
-        } else if (randomAngleType == 'Obtuso' && angleDegrees > 90 && angleDegrees < 180) {
+        } else if (randomAngleType == AngleType.OBTUSO && angleDegrees > 90 && angleDegrees < 180) {
             correct.play()
 
-        } else if (randomAngleType == 'Llano' && angleDegrees == 180) {
+        } else if (randomAngleType == AngleType.LLANO && angleDegrees == 180) {
             correct.play()
 
         } else if (randomAngleType == AngleType.CONCAVO && angleDegrees > 180 && angleDegrees < 360) {
@@ -206,7 +225,7 @@ function draggingTest1() {
         } else if (randomAngleType == AngleType.CONVEXO && angleDegrees > 0 && angleDegrees < 180) {
             correct.play()
 
-        } else if (randomAngleType == AngleType.NULO && angleDegrees == 0) {
+        } else if (randomAngleType == AngleType.NULO || randomAngleType == AngleType.PERIGONAL && angleDegrees == 0) {
             correct.play()
         } else {
             sound.play()
@@ -233,8 +252,16 @@ function addCustomButtom(width, height, posX, posY, text) {
     buttonText.setOrigin(0.5); // Center the text relative to the button
 
     button.on('pointerdown', function () {
-        context.clearRect(0, 0, game.canvas.width, game.canvas.height);
+        //context.clearRect(0, 0, game.canvas.width, game.canvas.height);
         draggingTest1()
+        console.log('hi')
+
+        // Fade out the current scene
+        this.cameras.main.fadeOut(500, 0, 0, 0, () => {
+            // Switch to the new scene after the fade out is complete
+            game.scene.switch('NewScene');
+        });
+
     });
 }
 
@@ -251,4 +278,5 @@ function createGameOptionAngleCreation() {
     context.add.text(200, 500, 'Crea un Angulo ' + randomAngleType, { fontFamily: 'Bradley Hand', fontSize: 28, color: '#eeeeee' })
 }
 
+// Define the new scene
 
