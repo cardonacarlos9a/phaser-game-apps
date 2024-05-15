@@ -53,7 +53,7 @@ var sound
 function preload() {
     context = this
     this.load.image('tipos', './assets/Tipos-de-angulos.webp')
-    this.load.audio('sound', ['../multiplicacion/sound.mp3'])
+    this.load.audio('sound', ['../multiplicacion/assets/sound.mp3'])
     this.load.audio('correct', ['../multiplicacion/correct.mp3'])
 }
 
