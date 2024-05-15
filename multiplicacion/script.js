@@ -19,7 +19,11 @@ var config = {
         update: update
     }
 };
-
+//Object have a reference for the global position of all elements in division
+const baseCoordinates = {
+    initialX: 0,
+    initialY: 0
+}
 //Styles
 const numberOptionStyle = {
     fontSize: '50px',
@@ -46,8 +50,11 @@ var positivePointsComponent;
 var spritebg;
 
 function preload() {
+    //Initialize coordinates for correct positioning
+    baseCoordinates.initialX = window.innerWidth
+    baseCoordinates.initialY = window.innerHeight
 
-    this.load.audio('sound', ['sound.mp3'])
+    this.load.audio('sound', ['./assets/sound.mp3'])
     this.load.audio('correct', ['correct.mp3'])
     this.load.html('nameform', 'nameForm.html');
     this.load.image('bg', 'bg.png');
@@ -66,32 +73,32 @@ function create() {
     this.scale.on('resize', resizeBackground, context);
     resizeBackground()
 
-    scoreText = this.add.text(16, 30, 'score: 0', { fontSize: '32px', fill: '#ffff' });
-    this.add.text(650, 10, 'Multiplications to rock', numberOptionStyle);
-    numSuperior = this.add.text(880, 100, 0, estiloMultiplicador);
-    numInferior = this.add.text(880, 170, 0, estiloMultiplicador);
-    this.add.line(900, 230, 0, 0, 100, 0, '0xffffff');
-    const playImage = this.add.image(900, 500, 'play').setScale(0.2);
+    scoreText = this.add.text(null, null, 'score: 0', { fontSize: '32px', fill: '#ffff' });
+    {//Creates centered title
+        const title = this.add.text(null, null, 'Multiplications to rock', numberOptionStyle);
+        const centerX = window.innerWidth / 2 - title.width / 2;
+        title.setX(centerX)
+    }
 
-    this.add.image(830, 180, 'multiplication').setScale(0.15)
+    numSuperior = this.add.text(window.innerWidth / 2, 100, 0, estiloMultiplicador);
+    numInferior = this.add.text(window.innerWidth / 2, 170, 0, estiloMultiplicador);
+    this.add.line(window.innerWidth / 2, 230, 0, 0, 100, 0, '0xffffff');
+    const playImage = this.add.image(window.innerWidth / 2, window.innerHeight / 1.4, 'play').setScale(0.2);
+
+    this.add.image(window.innerWidth / 2.2, 180, 'multiplication').setScale(0.15)
     //this.circle = this.add.circle(775, 375, 50, 0xa60e1a).setScale(1);
 
-    op1 = this.add.text(650, 350, 0, numberOptionStyle);
+    op1 = this.add.text(window.innerWidth / 3, 350, 0, numberOptionStyle);
     //Phaser.Display.Align.In.line( op1, this.circle );
 
-    op2 = this.add.text(800, 350, 0, numberOptionStyle);
-    op3 = this.add.text(950, 350, 0, numberOptionStyle);
-    op4 = this.add.text(1100, 350, 0, { fontSize: '55px', color: 'pink' });
-
-    createNavigationMenu(this);
+    op2 = this.add.text(window.innerWidth / 2.2, 350, 0, numberOptionStyle);
+    op3 = this.add.text(window.innerWidth / 1.7, 350, 0, numberOptionStyle);
+    op4 = this.add.text(window.innerWidth / 1.4, 350, 0, { fontSize: '55px', color: 'pink' });
 
     //Set pointer displayed as hand when hovering
     [op1, op2, op3, op4, playImage].forEach(e => {
         e.setInteractive({ cursor: 'pointer' });
     })
-
-    sprite2 = this.add.image(300, 250, 'grid');
-    sprite2.setScale(0.35)
 
     playImage.on('pointerdown',
         function () {
@@ -104,10 +111,13 @@ function create() {
             this.setTint(0xff0000);
         }
     );
-    negativePointsComponent = this.add.text(300, 350, '- ' + negativePointsCounter, numberOptionStyle);
-    positivePointsComponent = this.add.text(330, 450, positivePointsCounter, numberOptionStyle);
-
-    //Veifies if the clicked number is the correct answer
+    {//Points counter
+        this.add.text(10, 250, 'Incorrect');
+        negativePointsComponent = this.add.text(10, 300, '- ' + negativePointsCounter, numberOptionStyle);
+        this.add.text(10, 360, 'Correct');
+        positivePointsComponent = this.add.text(40, 400, positivePointsCounter, numberOptionStyle);
+    }
+    //Verifies if the clicked number is the correct answer
     [op1, op2, op3, op4].forEach(e => {
         e.setScale(1.5)
         e.on('pointerdown',
@@ -116,13 +126,13 @@ function create() {
                     scoreText.text++;
                     correct.play()
                     newMultiplication();
-                    positivePointsCounter += 1;
+                    positivePointsCounter++;
                     positivePointsComponent.text = positivePointsCounter
                 }
                 else {
                     sound.play()
-                    negativePointsCounter += 1;
-                    negativePointsComponent.text = '- ' + negativePointsCounter
+                    negativePointsCounter--;
+                    negativePointsComponent.text = negativePointsCounter
                     //this.cameras.main.shake(500)
                 }
             }
@@ -140,7 +150,7 @@ function create() {
 
     })
 
-    timerComponent = this.add.text(700, 700, 0, { fontSize: '32px', fill: '#ffff' });
+    timerComponent = this.add.text(window.innerWidth / 3, window.innerHeight / 1.2, 0, { fontSize: '32px', fill: '#ffff' });
     updateTimer()
     endGame = this.add.text(200, 200, 'OVER', { fontSize: '32px', fill: '#ffff' });
 
@@ -191,27 +201,6 @@ function newMultiplication() {
     })
 }
 
-function createNavigationMenu(context) {
-    const buttonWidth = 400;
-    const buttonHeight = 300;
-    const cornerRadius = 100;
-
-    const graphics = context.add.graphics();
-    graphics.fillStyle(0x3498db, 1); // Set fill color (use your desired color)
-    graphics.fillRoundedRect(2 - buttonWidth / 2, -6 - buttonHeight / 2, buttonWidth, buttonHeight, cornerRadius);
-
-    const button = context.add.text(400, 300, 'Divisiones', { fontSize: '32px', fill: '#fff', backgroundColor: 'red', color: 'red', cornerRadius: '20px' })
-        .setInteractive({ cursor: 'pointer' })
-        .on('pointerdown', () => {
-            // This function will be called when the button is clicked
-            window.location.href = 'experiment-game/index.html'; // Replace with your desired URL
-
-        });
-
-    // Set origin to center for proper positioning
-    button.setOrigin(2, -6);
-    return { graphics, button }
-}
 function resizeBackground() {
     // Calculate the scale factors to fit the background image to the screen
     let scaleX = window.innerWidth / spritebg.width;

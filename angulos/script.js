@@ -1,24 +1,6 @@
 
 import { speak, createText } from '../common/common.js'
-
-// Define the new scene
-class NewScene extends Phaser.Scene {
-    constructor() {
-        super({ key: 'NewScene' });
-    }
-
-    preload() {
-        // Preload assets for the new scene
-    }
-
-    create() {
-        // Create objects for the new scene
-    }
-
-    update() {
-        // Update logic for the new scene
-    }
-}
+import { PickAngleOption } from './scenes/correct-angle-option.js'
 
 var config = {
     type: Phaser.AUTO,
@@ -27,7 +9,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300   },
+            gravity: { y: 300 },
             debug: false
         }
     },
@@ -35,25 +17,16 @@ var config = {
         preload: preload,
         create: create,
         update: update
-    }, NewScene],
+    }, PickAngleOption],
     dom: {
         createContainer: true
     }
 };
 
-
-
-
-//Variables section
 var game = new Phaser.Game(config);
-var context;
-var randomAngleType;
-let angleDegrees;
-var correct
-var sound
 
 const AngleType = {
-    'AGUDO': 'Agudo',
+    AGUDO: 'Agudo',
     RECTO: 'Recto',
     OBTUSO: 'Obtuso',
     LLANO: 'Llano',
@@ -70,10 +43,16 @@ const inputStyle = {
     fontSize: '16px'
 };
 
+//Variables
+var context;
+var randomAngleType;
+let angleDegrees;
+var correct
+var sound
+
 function preload() {
     context = this
-    this.load.image('tipos', 'Tipos-de-angulos.webp')
-    // Sound to tell correct or incorrect
+    this.load.image('tipos', './assets/Tipos-de-angulos.webp')
     this.load.audio('sound', ['../multiplicacion/sound.mp3'])
     this.load.audio('correct', ['../multiplicacion/correct.mp3'])
 }
@@ -99,9 +78,7 @@ function create() {
     createText(context)
 }
 
-function update() {
-
-}
+function update() { }
 
 
 function createRectangle() {
@@ -142,8 +119,7 @@ function drawHalveCircle() {
 }
 
 function draggingTest1() {
-
-    (_ => { // Creates the horizontal line
+    (() => { // Creates the horizontal line
         const line = new Phaser.Geom.Line(200, 300, 400, 300);
         context.add.graphics()
             .lineStyle(2, 0xffffff)
@@ -169,47 +145,39 @@ function draggingTest1() {
     const bounds = new Phaser.Geom.Rectangle(Math.min(startX, endX), Math.min(startY, endY), Math.abs(endX - startX), Math.abs(endY - startY));
     // Enable input events on the line
     graphics.setInteractive(bounds, Phaser.Geom.Rectangle.Contains);
-    const updateLine = () => {
-        // Add pointermove event listener to drag the line
-        context.input.on('pointermove', function (pointer, localX, localY, event) {
+    // Add pointermove event listener to drag the line
+    context.input.on('pointermove', function (pointer, localX, localY, event) {
+        // Update the end point of the line
+        if (pointer.x <= 400 && pointer.y <= 500) {
+            endX = pointer.x;
+            endY = pointer.y;
 
+            // Calculate the angle between the fixed start point and the pointer position
+            const angle = Phaser.Math.Angle.Between(startX, startY, pointer.x, pointer.y);
 
-            // Update the end point of the line
-            if (pointer.x <= 400 && pointer.y <= 500) {
-                endX = pointer.x;
-                endY = pointer.y;
+            // Convert the angle to degrees
+            angleDegrees = Phaser.Math.RadToDeg(angle);
+            angleDegrees = (360 - angleDegrees) % 360;
+            angleDegrees = Math.floor(angleDegrees);
 
-                // Calculate the angle between the fixed start point and the pointer position
-                const angle = Phaser.Math.Angle.Between(startX, startY, pointer.x, pointer.y);
+            degrees.text = angleDegrees
 
-                // Convert the angle to degrees
-                angleDegrees = Phaser.Math.RadToDeg(angle);
-                angleDegrees = (360 - angleDegrees) % 360;
-                angleDegrees = Math.floor(angleDegrees);
-
-                degrees.text = angleDegrees
-
-            }
-            // Clear the graphics and redraw the line
-            graphics.clear();
-            graphics.lineStyle(2, 0xffffff);
-            graphics.beginPath();
-            graphics.moveTo(startX, startY); // Move to the start point
-            graphics.lineTo(endX, endY); // Draw a line to the end point
-            graphics.strokePath(); // Stroke the path
-        });
-    }
-
-    // Add pointermove event listener to update line direction
-    context.input.on('pointermove', updateLine);
+        }
+        // Clear the graphics and redraw the line
+        graphics.clear();
+        graphics.lineStyle(2, 0xffffff);
+        graphics.beginPath();
+        graphics.moveTo(startX, startY); // Move to the start point
+        graphics.lineTo(endX, endY); // Draw a line to the end point
+        graphics.strokePath(); // Stroke the path
+    });
 
     // Add click event listener to stop line movement
     context.input.on('pointerdown', function () {
         // Remove the pointermove event listener
         context.input.off('pointermove');
-        console.log('hola')
-        if (randomAngleType == 'Recto' && angleDegrees == 90) {
-            console.log('congratulations')
+        context.input.off('pointerdown');
+        if (randomAngleType == AngleType.RECTO && angleDegrees == 90) {
             correct.play()
         } else if (randomAngleType == AngleType.AGUDO && angleDegrees < 90 && angleDegrees > 0) {
             correct.play()
@@ -234,7 +202,6 @@ function draggingTest1() {
 }
 
 function addCustomButtom(width, height, posX, posY, text) {
-
     const defaultAtributes = {
         width: 150,
         height: 50,
@@ -252,16 +219,7 @@ function addCustomButtom(width, height, posX, posY, text) {
     buttonText.setOrigin(0.5); // Center the text relative to the button
 
     button.on('pointerdown', function () {
-        //context.clearRect(0, 0, game.canvas.width, game.canvas.height);
-        draggingTest1()
-        console.log('hi')
-
-        // Fade out the current scene
-        this.cameras.main.fadeOut(500, 0, 0, 0, () => {
-            // Switch to the new scene after the fade out is complete
-            game.scene.switch('NewScene');
-        });
-
+        context.scene.start('PickAngleOption');
     });
 }
 
