@@ -25,30 +25,31 @@ let context;
 var bg;
 
 function preload() {
+    context = this;
     this.load.image('bg', 'background.svg');
     this.load.image('division', 'division.webp');
     this.load.image('gif', 'divide.gif')
 }
 function create() {
-    context = this;
     // Add resize event listener
     this.scale.on('resize', resizeBackground, context);
 
     // Position button that contains the item to navigate to game
-    bg = this.add.image(0, 0, 'bg').setOrigin(0);
-    
-    positionItemButon(context.sys.game.config.width * 0.2, 200, '/division/index.html', 'Division')
-    positionItemButon(context.sys.game.config.width * 0.4, 200, '/multiplicacion/index.html', 'Multiplication')
-    positionItemButon(context.sys.game.config.width * 0.6, 200, '/angulos/index.html', 'Angulos')
-    positionItemButon(context.sys.game.config.width * 0.2, 400, 'https://local-learning-app.vercel.app/', 'Dict Mejorado')
-    positionItemButon(context.sys.game.config.width * 0.4, 400, 'https://play-ground-angular-teaching.vercel.app/', 'Generador')
+    bg = this.add.image(0, 0, 'bg').setOrigin(0)
+        .setScale(config.width / this.textures.get('bg').getSourceImage().width,
+            config.height / this.textures.get('bg').getSourceImage().height);
 
+    {//Position the apps buttons at home screen
+        positionItemButon(context.sys.game.config.width * 0.2, 200, '/division/index.html', 'Division')
+        positionItemButon(context.sys.game.config.width * 0.4, 200, '/multiplicacion/index.html', 'Multiplication')
+        positionItemButon(context.sys.game.config.width * 0.6, 200, '/angulos/index.html', 'Angulos')
+        positionItemButon(context.sys.game.config.width * 0.2, 400, 'https://local-learning-app.vercel.app/', 'Dict Mejorado')
+        positionItemButon(context.sys.game.config.width * 0.4, 400, 'https://play-ground-angular-teaching.vercel.app/', 'Generador')
+    }
     // Add CSS to remove border
     document.body.style.margin = '0';
     document.body.style.padding = '0';
-
 }
-
 
 function update() {
     //console.log(context.sys.game.config.width)
@@ -139,10 +140,10 @@ function positionItemButon(posX, posY, navigationUrl, buttonText) {
 }
 
 function resizeBackground() {
-     // Calculate the scale factors to fit the background image to the screen
-     let scaleX = window.innerWidth / bg.width;
-     let scaleY = window.innerHeight / bg.height;
- 
-     // Set the scale of the background image
-     bg.setScale(scaleX, scaleY);
+    // Calculate the scale factors to fit the background image to the screen
+    let scaleX = window.innerWidth / bg.width;
+    let scaleY = window.innerHeight / bg.height;
+
+    // Set the scale of the background image
+    bg.setScale(scaleX, scaleY);
 }
