@@ -30,7 +30,7 @@ const dividendo = generarNumeroAleatorio(10000000);
 const divisor = generarNumeroAleatorio(100);
 let dividendoParcialGlobal = extraerDividendoParcial(dividendo);
 let context;
-//Grupo de globo de info con texto dentro
+//Grupo de globo de info con texto dentro y equis para cerrar
 let group;
 //indice global para agregar el 'index' como data a cada caja de texto creada
 let index = 0;
@@ -66,8 +66,10 @@ let screenHeight = 0
 //Some background
 var spritebg;
 var text
+//Button to show the information bubble
+let infoButton;
 
-//Object have a reference for the global position of all elements in division
+//Object has a reference for the global position of all elements in division
 const baseCoordinates = {
     initialX: 0,
     initialY: 0
@@ -101,17 +103,15 @@ function preload() {
 function create() {
     spritebg = this.add.image(0, 0, 'bg').setOrigin(0);
     spritebg.setScale(config.width / spritebg.width, config.height / spritebg.height)
-    //Initialize vars creation of groups
+    //Creates two groups
     group = this.add.group()
     arrowGroup = this.add.group();
+    this.scale.on('resize', _ => {
+        resizeBackground()
+    }, context);
 
-    this.scale.on('resize', resizeBackground, context);
-
-    // posicionar numeros de dividendo y divisor
+    // posicionar numeros de dividendo y divisor, first step to show division
     positionNumbers(this, dividendo)
-    ponerLineaYDivisor(this, divisor)
-    //Crear caja informativa y flechas
-    ejecutarPistaUno(context)
     tryAgain = this.sound.add('tryAgain')
 }
 
@@ -153,6 +153,7 @@ function handleTextInput(event) {
 }
 //Metodo encargado de posicionar los numeros del dividendo
 function positionNumbers(context, dividendo) {
+    ponerLineaYDivisor(context, divisor)
     const posicionarDividendo = (context, valor, posX, posY) => {
         const button = context.add.text(posX, posY, valor,
             {
@@ -167,6 +168,8 @@ function positionNumbers(context, dividendo) {
     for (const char of dividendo.toString()) {
         posicionarDividendo(context, char, posX += 40, posY)
     }
+    ejecutarPistaUno(context)
+
 }
 //Handles the creation of the arrow for digit separation and calls 
 // function to create the cocient cocient boxes
@@ -241,8 +244,8 @@ function createOtherArrow(context, x, y, escala, parametros) {
             text.setVisible(false)
             infoBubble.setVisible(false)
             //TODO - Poner siguiente pista para buscar el primer digito del cociente
-            crearGloboInformacion(context, 'Ahora busca el\nprimer digito\ndel cociente', 500, 50, 350, 150)
-            
+            crearGloboInformacion(context, 'Ahora busca el\nprimer digito\ndel cociente', window.innerWidth/2, window.innerHeight/2, 350, 150)
+
             //Creacion de caja cociente para ingreso de texto
             crearCajaTexto(context, baseCoordinates.initialX + numeroCajaCociente * 40 + dividendo.toString().length * 40 + 40, baseCoordinates.initialY + 30, 30, 20, 'cociente')
 
@@ -403,7 +406,7 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     indicePosicionLineaResta++;
 
                     ponerCajasResultadoMultiplicacion();
-                    
+
                     infoBubble.setVisible(false)
                     text.setVisible(false)
                     crearGloboInformacion(context, "A continuacion realiza\n la resta", 500, 100, 500, 60)
@@ -444,7 +447,7 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     numeroCajaCociente++;
                     //ocultar flecha de la pista del numero a bajar
                     ocultarFlechasPistaBajarNumero()
-                    
+
                     //
                     infoBubble.setVisible(false)
                     text.setVisible(false)
@@ -493,6 +496,7 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
 }
 
 function crearGloboInformacion(context, information, posX, posY, width, height, operacionAdicional) {
+    const animationMovementX = 100;
     // Create a rectangle representing the information bubble
     infoBubble = context.add.graphics();
     infoBubble.fillStyle(0xffffff).fillRoundedRect(posX, posY, width, height, 20).setInteractive();
@@ -512,24 +516,37 @@ function crearGloboInformacion(context, information, posX, posY, width, height, 
     //text.setOrigin(0.5)
     group = context.add.group(); // Create a Phaser group
 
-    group.addMultiple(infoBubble); // Add both the infoBubble and text to the group
-    group.addMultiple(text); // Add both the infoBubble and text to the group
+    //Create the X on the top left corner
+    let closeButton = context.add.text(posX + width + animationMovementX-20, posY, 'x', { fill: 'black', fontSize: 28 })
+        .setInteractive({ cursor: 'pointer' })
+    closeButton.on('pointerdown', function () {
+        group.setVisible(false)
+        createInfoButton()
+    });
+
+    // Handle hover effect
+    closeButton.on('pointerover', function () {
+        closeButton.setScale(1.2); // Increase size by 20%
+    });
+    closeButton.on('pointerout', function () {
+        closeButton.setScale(1); // Reset to original size
+    });
+
+    group.addMultiple([infoBubble, text, closeButton]); // Add both the infoBubble and text to the group
 
     // Animate the group to move to the left
     context.tweens.add({
         targets: infoBubble, // Target the entire group
-        x: 350, // Move to the left on the x-axis
+        x: animationMovementX, // Move to the left on the x-axis
         ease: 'Cubic.InOut',
         duration: 1000,
         onUpdate: function () {
             // Update the position of the text relative to the group
             text.x = infoBubble.x + posX + 20
-
         },
         onComplete: function () {
             if (operacionAdicional) {
                 operacionAdicional();
-
             }
         }
     });
@@ -818,4 +835,33 @@ function resizeBackground() {
     // Set the scale of the background image
     spritebg.setScale(scaleX, scaleY);
 
+}
+
+function createInfoButton() {
+
+    // Create the background rectangle for the info button
+    let buttonBackground = context.add.graphics();
+    buttonBackground.fillStyle('0x00ff00', 1); // Green color
+    buttonBackground.fillRoundedRect(context.sys.game.config.width / 2-4, 10, 30, 33, 15); // Adjust position and size as needed
+
+    // Create the "info" button on the top right corner
+    infoButton = context.add.text(context.sys.game.config.width / 2, 10, 'i', { fill: '#0000ff', fontSize: '2rem' });
+    infoButton.setInteractive({ cursor: 'pointer' });
+
+    // Handle hover effect
+    infoButton.on('pointerover', function () {
+        infoButton.setScale(1.2)
+        //buttonBackground.setScale(1.2)
+    });
+
+    infoButton.on('pointerout', function () {
+        infoButton.setScale(1); // Reset to original size
+    });
+
+    // Handle click to show the group
+    infoButton.on('pointerdown', function () {
+        group.setVisible(true); // Show the group of information
+        infoButton.setVisible(false)
+        buttonBackground.setVisible(false)
+    });
 }
