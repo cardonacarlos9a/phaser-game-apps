@@ -68,7 +68,8 @@ var spritebg;
 var text
 //Button to show the information bubble
 let infoButton;
-
+//Button to close info bubble
+let closeButton
 //Object has a reference for the global position of all elements in division
 const baseCoordinates = {
     initialX: 0,
@@ -514,10 +515,9 @@ function crearGloboInformacion(context, information, posX, posY, width, height, 
     text = context.add.text(posX, posY, information, { fill: '#000000', fontSize: 28 });
     text.setVisible(true)
     //text.setOrigin(0.5)
-    group = context.add.group(); // Create a Phaser group
 
     //Create the X on the top left corner
-    let closeButton = context.add.text(posX + width + animationMovementX-20, posY, 'x', { fill: 'black', fontSize: 28 })
+    closeButton = context.add.text(posX + width + animationMovementX-20, posY, 'x', { fill: 'black', fontSize: 28 })
         .setInteractive({ cursor: 'pointer' })
     closeButton.on('pointerdown', function () {
         group.setVisible(false)
@@ -532,6 +532,7 @@ function crearGloboInformacion(context, information, posX, posY, width, height, 
         closeButton.setScale(1); // Reset to original size
     });
 
+    group = context.add.group(); // Create a Phaser group
     group.addMultiple([infoBubble, text, closeButton]); // Add both the infoBubble and text to the group
 
     // Animate the group to move to the left
