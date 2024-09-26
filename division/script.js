@@ -245,7 +245,7 @@ function createOtherArrow(context, x, y, escala, parametros) {
             text.setVisible(false)
             infoBubble.setVisible(false)
             //TODO - Poner siguiente pista para buscar el primer digito del cociente
-            crearGloboInformacion(context, 'Ahora busca el\nprimer digito\ndel cociente', window.innerWidth/2, window.innerHeight/2, 350, 150)
+            crearGloboInformacion(context, 'Ahora busca el\nprimer digito\ndel cociente', window.innerWidth / 2, window.innerHeight / 2, 350, 150)
 
             //Creacion de caja cociente para ingreso de texto
             crearCajaTexto(context, baseCoordinates.initialX + numeroCajaCociente * 40 + dividendo.toString().length * 40 + 40, baseCoordinates.initialY + 30, 30, 20, 'cociente')
@@ -382,7 +382,7 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     text.setVisible(false)
 
                     crearGloboInformacion(context, "Ahora multiplica el numero\n que encontraste por el\ndivisor y lo ubicas en las\n cajas"
-                        + " negras para realizar\n la resta", 500, 100, 500, 150)
+                        + " negras", 500, 100, 500, 150)
                     //Poner cajas resta y estructura
                     ponerCajasResta()
                     context.input.keyboard.off('keydown', handleTextInputChange, context);
@@ -412,6 +412,10 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     text.setVisible(false)
                     crearGloboInformacion(context, "A continuacion realiza\n la resta", 500, 100, 500, 60)
 
+                    //
+                    auxInputBackground.setFillStyle()
+                    //auxInputBackground.off('pointerdown')
+                    //auxInputBackground.setInteractive({ cursor: 'default' })
                 }
             }
 
@@ -428,6 +432,8 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     text.setVisible(false)
                     crearGloboInformacion(context, "Ahora baja el digito que te\n indica la flecha", 500, 100, 500, 60)
 
+                    //Ocultar caja negra resta
+                    auxInputBackground.setFillStyle()
                 }
 
             }
@@ -454,6 +460,8 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     text.setVisible(false)
                     crearGloboInformacion(context, "Continua completando\n el cociente", 500, 100, 500, 60)
 
+                    //Oculta caja negra digito bajado
+                    auxInputBackground.setFillStyle()
                 }
             }
 
@@ -517,7 +525,7 @@ function crearGloboInformacion(context, information, posX, posY, width, height, 
     //text.setOrigin(0.5)
 
     //Create the X on the top left corner
-    closeButton = context.add.text(posX + width + animationMovementX-20, posY, 'x', { fill: 'black', fontSize: 28 })
+    closeButton = context.add.text(posX + width + animationMovementX - 20, posY, 'x', { fill: 'black', fontSize: 28 })
         .setInteractive({ cursor: 'pointer' })
     closeButton.on('pointerdown', function () {
         group.setVisible(false)
@@ -668,6 +676,8 @@ function comprobarMultiplicacionParcialCorrecta() {
             (rectangle => rectangle.getData('tipo') === 'auxiliarMultiplicacion').forEach(rectangle => {
                 //let cajaIngresoTexto = context.children.getChildren().find(element => element.getData('index') === 'texto' + rectangle.getData('index'))
                 rectangle.setData('tipo', 'auxiliarMultiplicacionProcesada')
+                //rectangle.fillColor('orange')
+                rectangle.setFillStyle()
             });
         return true;
     } else {
@@ -705,6 +715,7 @@ function comprobarRestaCorrecta() {
         context.children.getChildren().filter
             (rectangle => rectangle.getData('tipo') === 'auxiliarResta').forEach(rectangle => {
                 rectangle.setData('tipo', 'auxiliarRestaProcesada')
+                rectangle.setFillStyle()
             });
 
         //Incrementar el apuntador al siguiente digito del dividendo que se debera bajar
@@ -843,7 +854,7 @@ function createInfoButton() {
     // Create the background rectangle for the info button
     let buttonBackground = context.add.graphics();
     buttonBackground.fillStyle('0x00ff00', 1); // Green color
-    buttonBackground.fillRoundedRect(context.sys.game.config.width / 2-4, 10, 30, 33, 15); // Adjust position and size as needed
+    buttonBackground.fillRoundedRect(context.sys.game.config.width / 2 - 4, 10, 30, 33, 15); // Adjust position and size as needed
 
     // Create the "info" button on the top right corner
     infoButton = context.add.text(context.sys.game.config.width / 2, 10, 'i', { fill: '#0000ff', fontSize: '2rem' });
