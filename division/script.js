@@ -26,8 +26,8 @@ var config = {
 var game = new Phaser.Game(config);
 let infoBubble;
 let arrowGroup;
-const dividendo = 175470 || generarNumeroAleatorio(10000000);
-const divisor = 7 || generarNumeroAleatorio(100);
+const dividendo = generarNumeroAleatorio(10000000);
+const divisor = generarNumeroAleatorio(100);
 let dividendoParcialGlobal = extraerDividendoParcial(dividendo);
 let context;
 //Grupo de globo de info con texto dentro y equis para cerrar
