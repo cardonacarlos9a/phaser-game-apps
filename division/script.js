@@ -26,8 +26,8 @@ var config = {
 var game = new Phaser.Game(config);
 let infoBubble;
 let arrowGroup;
-const dividendo = generarNumeroAleatorio(10000000);
-const divisor = generarNumeroAleatorio(100);
+const dividendo = 175470 || generarNumeroAleatorio(10000000);
+const divisor = 7 || generarNumeroAleatorio(100);
 let dividendoParcialGlobal = extraerDividendoParcial(dividendo);
 let context;
 //Grupo de globo de info con texto dentro y equis para cerrar
@@ -372,7 +372,18 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                 cajaTexto.text = event.key
 
                 if (comprobarCocienteParcialCorrecto(diviDendoParcial, divisor, cajaTexto)) {
-
+                    let cocienteParcial = Math.floor(diviDendoParcial / divisor)
+                    const stepsWhenCocienteIsZero = () => {
+                        //crearGloboInformacion(context, "Baja el digito que te\n indica la flecha", 500, 100, 500, 60)
+                        indiceColumnasY--
+                        indicePosicionLineaResta++;
+                        pistaBajarSiguienteDigito()
+                    }
+                    const stepsWhenCocienteIsNotZero = () => {
+                        crearGloboInformacion(context, "Ahora multiplica el numero\n que encontraste por el\ndivisor y lo ubicas en las\n cajas"
+                            + " negras", 500, 100, 500, 150)
+                        ponerCajasResta()
+                    }
                     auxInputBackground.setFillStyle()
                     auxInputBackground.off('pointerdown')
                     auxInputBackground.setInteractive({ cursor: 'default' })
@@ -381,14 +392,14 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     infoBubble.setVisible(false)
                     text.setVisible(false)
 
-                    crearGloboInformacion(context, "Ahora multiplica el numero\n que encontraste por el\ndivisor y lo ubicas en las\n cajas"
-                        + " negras", 500, 100, 500, 150)
                     //Poner cajas resta y estructura
-                    ponerCajasResta()
                     context.input.keyboard.off('keydown', handleTextInputChange, context);
                     keyDownEventHandler = false
                     ultimoDigitoCociente = cajaTexto.text
                     //Poner pista de 
+
+                    //No debemos poner cajas de resta si el cociente parcial agregado fue cero
+                    cocienteParcial != 0 ? stepsWhenCocienteIsNotZero() : stepsWhenCocienteIsZero()
                 }
             } else {
                 console.log("recuerda que solo puedes ingresar numeros")
@@ -607,10 +618,7 @@ function ejecutarPistaUno(context) {
 
 function comprobarCocienteParcialCorrecto(dividendoParcial, divisor, inputText) {
     let cocienteParcial = Math.floor(dividendoParcial / divisor)
-    if (cocienteParcial == parseInt(inputText?.text)) {
-        return true;
-    }
-    return false;
+    return cocienteParcial == parseInt(inputText?.text)
 }
 
 function extraerDividendoParcial(dividendoCompleto) {
