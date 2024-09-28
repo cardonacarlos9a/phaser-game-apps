@@ -104,7 +104,7 @@ function preload() {
     context.load.spritesheet('mySprite', 'spritesheet.png', {
         frameWidth: 200,
         frameHeight: 200,
-        endFrame: 79 // This should be 23 if you want 24 frames (starting from 0)
+        endFrame: 15 // This should be 23 if you want 24 frames (starting from 0)
     }); 
 
     context.load.spritesheet('mySprite2', 'spritesheet2.png', {
@@ -137,7 +137,7 @@ function create() {
     //
     this.anims.create({
         key: 'playAnimation',
-        frames: this.anims.generateFrameNumbers('mySprite', { start: 0, end: 23 }), // Start and end frames
+        frames: this.anims.generateFrameNumbers('mySprite', { start: 0, end: 14 }), // Start and end frames
         frameRate: 10, // Speed of the animation
         repeat: -1 // Loop the animation
     });
@@ -146,7 +146,7 @@ function create() {
 
     this.anims.create({
         key: 'playAnimation2',
-        frames: this.anims.generateFrameNumbers('mySprite2', { start: 0, end: 23 }), // Start and end frames
+        frames: this.anims.generateFrameNumbers('mySprite2', { start: 0, end: 78 }), // Start and end frames
         frameRate: 10, // Speed of the animation
         repeat: -1 // Loop the animation
     });
