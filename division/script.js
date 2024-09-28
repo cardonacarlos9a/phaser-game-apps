@@ -99,6 +99,13 @@ function preload() {
     this.load.image('questionMark', 'questionMark.svg');
     this.load.audio('tryAgain', ['ohno.mp3'])
     console.log(window.innerHeight, context.sys.game.config.height)
+    
+    // Load the sprite sheet
+    context.load.spritesheet('mySprite', 'spritesheet.png', {
+        frameWidth: 200,
+        frameHeight: 200,
+        endFrame: 79 // This should be 23 if you want 24 frames (starting from 0)
+    });
 }
 
 function create() {
@@ -114,6 +121,17 @@ function create() {
     // posicionar numeros de dividendo y divisor, first step to show division
     positionNumbers(this, dividendo)
     tryAgain = this.sound.add('tryAgain')
+
+    //
+    this.anims.create({
+        key: 'playAnimation',
+        frames: this.anims.generateFrameNumbers('mySprite', { start: 0, end: 23 }), // Start and end frames
+        frameRate: 10, // Speed of the animation
+        repeat: -1 // Loop the animation
+    });
+    const sprite = this.add.sprite(200, 500, 'mySprite');
+    sprite.play('playAnimation'); // Play the animation
+
 }
 
 function update() {
