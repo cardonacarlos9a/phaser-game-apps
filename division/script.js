@@ -112,6 +112,12 @@ function preload() {
         frameHeight: 200,
         endFrame: 79 // This should be 23 if you want 24 frames (starting from 0)
     });
+
+    context.load.spritesheet('mySprite3', 'banana.png', {
+        frameWidth: 200,
+        frameHeight: 200,
+        endFrame: 8 // This should be 23 if you want 24 frames (starting from 0)
+    }); 
 }
 
 function create() {
@@ -146,6 +152,15 @@ function create() {
     });
     const sprite2 = this.add.sprite(900, 500, 'mySprite2');
     sprite2.play('playAnimation2'); // Play the animation
+
+    this.anims.create({
+        key: 'playAnimation3',
+        frames: this.anims.generateFrameNumbers('mySprite3', { start: 0, end: 7 }), // Start and end frames
+        frameRate: 5, // Speed of the animation
+        repeat: -1 // Loop the animation
+    });
+    const sprite3 = this.add.sprite(100, 150, 'mySprite3');
+    sprite3.play('playAnimation3'); // Play the animation
 
 }
 
