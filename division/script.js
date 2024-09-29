@@ -178,7 +178,7 @@ function create() {
         repeat: 0 // Loop the animation
     });
 
-    sprite2 = context.add.sprite(900, 500, 'mySprite2');
+    sprite2 = context.add.sprite(700, 250, 'mySprite2');
 
     this.anims.create({
         key: 'playAnimation3',
@@ -189,24 +189,25 @@ function create() {
     const sprite3 = this.add.sprite(100, 150, 'mySprite3');
     sprite3.play('playAnimation3'); // Play the animation
 
-    this.anims.create({
-        key: 'playAnimation4',
-        frames: this.anims.generateFrameNumbers('mySprite4', { start: 0, end: 13 }), // Start and end frames
-        frameRate: 10, // Speed of the animation
-        repeat: -1 // Loop the animation
-    });
-    const sprite4 = this.add.sprite(700, 150, 'mySprite4');
-    sprite4.play('playAnimation4'); // Play the animation 
-
+    
     this.anims.create({
         key: 'playAnimation5',
         frames: this.anims.generateFrameNumbers('mySprite5', { start: 0, end: 13 }), // Start and end frames
         frameRate: 10, // Speed of the animation
         repeat: -1 // Loop the animation
     });
-    const sprite5 = this.add.sprite(700, 300, 'mySprite5');
+    const sprite5 = this.add.sprite(1000, 400, 'mySprite5');
     sprite5.play('playAnimation5'); // Play the animation 
-
+    
+    //animation for telephone
+    this.anims.create({
+        key: 'playAnimation4',
+        frames: this.anims.generateFrameNumbers('mySprite4', { start: 0, end: 13 }), // Start and end frames
+        frameRate: 10, // Speed of the animation
+        repeat: -1 // Loop the animation
+    });
+    const sprite4 = this.add.sprite(1000, 255, 'mySprite4');
+    sprite4.play('playAnimation4'); // Play the animation 
 }
 
 function update() {
@@ -478,7 +479,7 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                     }
                     const stepsWhenCocienteIsNotZero = () => {
                         crearGloboInformacion(context, "Ahora multiplica el numero\n que encontraste por el\ndivisor y lo ubicas en las\n cajas"
-                            + " negras", 500, 100, 500, 150)
+                            + " negras", 600, 40, 500, 150)
                         ponerCajasResta()
                     }
                     auxInputBackground.setFillStyle()
