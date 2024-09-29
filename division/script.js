@@ -58,8 +58,10 @@ let numeroCajaCociente = 1
 let indicePosicionLineaResta = 1
 // Posicion para ubicar las lineas separadoras del resultado de resta en el eje y
 let posicionLineaRestaEjeY = 67.5
+//AUDIOS
 //Audio incorrecto
 let tryAgain
+let veryGood
 // Get the width and height of the game screen
 let screenWidth = 0
 let screenHeight = 0
@@ -83,6 +85,11 @@ const inputStyle = {
     fontSize: '16px'
 };
 
+//vars to reference animations
+let sprite2;
+
+
+
 function preload() {
     context = this;
     if (context.sys.game.config.width < 500) {
@@ -97,7 +104,10 @@ function preload() {
     this.load.image('bg', 'bg.png');
     //this.load.image('letter-d', 'letter-d.png');
     this.load.image('questionMark', 'questionMark.svg');
+
+    //Load Audios
     this.load.audio('tryAgain', ['ohno.mp3'])
+    this.load.audio('veryGood', ['Verygood.mp3'])
     console.log(window.innerHeight, context.sys.game.config.height)
 
     // Load the sprite sheet
@@ -117,7 +127,23 @@ function preload() {
         frameWidth: 200,
         frameHeight: 200,
         endFrame: 8 // This should be 23 if you want 24 frames (starting from 0)
-    }); 
+    });
+    
+    context.load.spritesheet('mySprite4', 'telephone.png', {
+        frameWidth: 200,
+        frameHeight: 200,
+        endFrame: 14 // This should be 23 if you want 24 frames (starting from 0)
+    });
+
+    context.load.spritesheet('mySprite5', 'corazon.png', {
+        frameWidth: 200,
+        frameHeight: 200,
+        endFrame: 12 // This should be 23 if you want 24 frames (starting from 0)
+    });
+
+    
+    
+
 }
 
 function create() {
@@ -133,6 +159,7 @@ function create() {
     // posicionar numeros de dividendo y divisor, first step to show division
     positionNumbers(this, dividendo)
     tryAgain = this.sound.add('tryAgain')
+    veryGood = this.sound.add('veryGood')
 
     //
     this.anims.create({
@@ -146,21 +173,39 @@ function create() {
 
     this.anims.create({
         key: 'playAnimation2',
-        frames: this.anims.generateFrameNumbers('mySprite2', { start: 0, end: 78 }), // Start and end frames
-        frameRate: 10, // Speed of the animation
-        repeat: -1 // Loop the animation
+        frames: this.anims.generateFrameNumbers('mySprite2', { start: 0, end: 72 }), // Start and end frames
+        frameRate: 40, // Speed of the animation
+        repeat: 0 // Loop the animation
     });
-    const sprite2 = this.add.sprite(900, 500, 'mySprite2');
-    sprite2.play('playAnimation2'); // Play the animation
+
+    sprite2 = context.add.sprite(900, 500, 'mySprite2');
 
     this.anims.create({
         key: 'playAnimation3',
         frames: this.anims.generateFrameNumbers('mySprite3', { start: 0, end: 7 }), // Start and end frames
-        frameRate: 5, // Speed of the animation
+        frameRate: 2, // Speed of the animation
         repeat: -1 // Loop the animation
     });
     const sprite3 = this.add.sprite(100, 150, 'mySprite3');
     sprite3.play('playAnimation3'); // Play the animation
+
+    this.anims.create({
+        key: 'playAnimation4',
+        frames: this.anims.generateFrameNumbers('mySprite4', { start: 0, end: 13 }), // Start and end frames
+        frameRate: 10, // Speed of the animation
+        repeat: -1 // Loop the animation
+    });
+    const sprite4 = this.add.sprite(700, 150, 'mySprite4');
+    sprite4.play('playAnimation4'); // Play the animation 
+
+    this.anims.create({
+        key: 'playAnimation5',
+        frames: this.anims.generateFrameNumbers('mySprite5', { start: 0, end: 13 }), // Start and end frames
+        frameRate: 10, // Speed of the animation
+        repeat: -1 // Loop the animation
+    });
+    const sprite5 = this.add.sprite(700, 300, 'mySprite5');
+    sprite5.play('playAnimation5'); // Play the animation 
 
 }
 
@@ -306,7 +351,7 @@ function createOtherArrow(context, x, y, escala, parametros) {
 
         } else {
             //Give feedback about incorrect separation of digits
-            moverOjosYSignoInterrogacion()
+            //moverOjosYSignoInterrogacion()
             tryAgain.play()
         }
 
@@ -381,6 +426,7 @@ function removeBlink(auxCajaTexto) {
  * @param {context} context 
  */
 function crearCajaTexto(context, posX, posY, width, height, tipo) {
+
     index++;
     // let cursorBlinkIntervalId; pendiente implementar
     let inputBackground = context.add.rectangle(context.sys.game.config.width / 5, posY, width, height, 'orange').setData({ 'index': 'R' + index, 'tipo': tipo }).
@@ -420,6 +466,9 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
                 cajaTexto.text = event.key
 
                 if (comprobarCocienteParcialCorrecto(diviDendoParcial, divisor, cajaTexto)) {
+                    sprite2.play('playAnimation2'); // Play the animation
+                    veryGood.play()
+
                     let cocienteParcial = Math.floor(diviDendoParcial / divisor)
                     const stepsWhenCocienteIsZero = () => {
                         //crearGloboInformacion(context, "Baja el digito que te\n indica la flecha", 500, 100, 500, 60)

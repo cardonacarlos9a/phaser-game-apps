@@ -30,6 +30,7 @@ function preload() {
     this.load.image('division', 'division.webp');
     this.load.image('gif', 'divide.gif')
 }
+
 function create() {
     // Add resize event listener
     this.scale.on('resize', resizeBackground, context);
@@ -73,6 +74,7 @@ function positionBackgroundImage() {
  * Positions the button that we click at the initial screen to navigate to an app
  */
 function positionItemButon(posX, posY, navigationUrl, buttonText) {
+   
     //defineScreenSize()
     // Create a graphics object
     const graphics = context.add.graphics();
@@ -130,10 +132,22 @@ function positionItemButon(posX, posY, navigationUrl, buttonText) {
         graphics.fillStyle(0xFF7171, 1);
 
     });
-
+   
     graphics.on('pointerdown', function () {
-        console.log('click')
-        window.location.href = navigationUrl; // Replace with your desired URL
+
+        if(buttonText!='Division'){
+            let userInput = prompt("Please enter password");
+    
+            // Check if user input is not null (Cancel returns null)
+            if (userInput !== "pass") {
+                alert("You entered incorrect password ");
+                return
+            } else {
+                alert("You are authorized");
+            }
+        }
+
+        window.location.href = navigationUrl; // Navigate to specific url
         graphics.fillStyle(0xFF7171, 1);
 
     })
