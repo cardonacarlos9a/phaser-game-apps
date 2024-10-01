@@ -33,3 +33,47 @@ body {
     margin: 0;
     padding: 0;
 }
+
+.cajaTexto {
+    display: flex;
+    position: absolute;
+    top: 3%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #75A193;
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+    font-size: 2rem;
+    border: none;
+    width: 50%;
+    align-items: right;
+    justify-content: right;
+}
+.cajaTexto:focus {
+    outline: none;
+}
+
+.cajaTexto:hover {
+    cursor: default;
+    pointer-events: none; /* Disable any interaction */
+}
+.logo {
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: none;
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.bookTemplate{
+    width: 100vw;
+    height: 200vh;
+}

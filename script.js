@@ -29,6 +29,7 @@ function preload() {
     this.load.image('bg', 'background.svg');
     this.load.image('division', 'division.webp');
     this.load.image('gif', 'divide.gif')
+    this.load.image('logo', 'assets/logo.png')
 }
 
 function create() {
@@ -46,10 +47,13 @@ function create() {
         positionItemButon(context.sys.game.config.width * 0.6, 200, '/angulos/index.html', 'Angulos')
         positionItemButon(context.sys.game.config.width * 0.2, 400, 'https://local-learning-app.vercel.app/', 'Dict Mejorado')
         positionItemButon(context.sys.game.config.width * 0.4, 400, 'https://play-ground-angular-teaching.vercel.app/', 'Generador')
+        positionItemButon(context.sys.game.config.width * 0.6, 400, '/books/index.html', 'Books')
     }
     // Add CSS to remove border
     document.body.style.margin = '0';
     document.body.style.padding = '0';
+
+    placeLogo()
 }
 
 function update() {
@@ -74,7 +78,7 @@ function positionBackgroundImage() {
  * Positions the button that we click at the initial screen to navigate to an app
  */
 function positionItemButon(posX, posY, navigationUrl, buttonText) {
-   
+
     //defineScreenSize()
     // Create a graphics object
     const graphics = context.add.graphics();
@@ -132,12 +136,12 @@ function positionItemButon(posX, posY, navigationUrl, buttonText) {
         graphics.fillStyle(0xFF7171, 1);
 
     });
-   
+
     graphics.on('pointerdown', function () {
 
-        if(buttonText!='Division'){
+        if (buttonText != 'Division') {
             let userInput = prompt("Please enter password");
-    
+
             // Check if user input is not null (Cancel returns null)
             if (userInput !== "pass") {
                 alert("You entered incorrect password ");
@@ -160,4 +164,8 @@ function resizeBackground() {
 
     // Set the scale of the background image
     bg.setScale(scaleX, scaleY);
+}
+
+function placeLogo() {
+    context.add.image(0, 0, 'logo').setOrigin(0).setScale(0.5,0.5)
 }
