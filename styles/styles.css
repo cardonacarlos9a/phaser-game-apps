@@ -32,7 +32,11 @@
 body {
     margin: 0;
     padding: 0;
+    background-color: #75A193;
+    overflow: hidden;
 }
+
+
 
 .cajaTexto {
     display: flex;

@@ -215,6 +215,8 @@ function create() {
     sprite4.on('pointerover', () => {
         sprite4.play('playAnimation4');
     });
+
+    //experimental()
 }
 
 function update() {
@@ -434,12 +436,14 @@ function removeBlink(auxCajaTexto) {
  * @param {context} context 
  */
 function crearCajaTexto(context, posX, posY, width, height, tipo) {
-
+    //experimental(context.sys.game.config.width / 5,posY,width,height)
     index++;
     // let cursorBlinkIntervalId; pendiente implementar
-    let inputBackground = context.add.rectangle(context.sys.game.config.width / 5, posY, width, height, 'orange').setData({ 'index': 'R' + index, 'tipo': tipo }).
+
+    let inputBackground = context.add.rectangle(context.sys.game.config.width / 5, posY, width, height, 'red').setData({ 'index': 'R' + index, 'tipo': tipo }).
         setInteractive({ cursor: 'pointer' })
         .on('pointerdown', function () {
+            inputBackground.fillColor = 0xeab676; // Change the color to green (you can use any hex value)
 
             //global variable containing the index of the box that was clicked
             inputTextBoxClicked = inputBackground.getData('index')
@@ -613,7 +617,11 @@ function crearCajaTexto(context, posX, posY, width, height, tipo) {
             //inputBackground.fillRect(posX, posY, width, height);
         },
         onComplete: function () {
-            inputText = context.add.text(inputBackground.x - 8, inputBackground.y - 13, '', { fontSize: '32px', color: "white" }).setData('index', "texto" + inputBackground.getData('index'));
+            context.add.graphics({ fillStyle: { color: 0xeab676 } })
+            .fillRoundedRect(
+        inputBackground.x - 15, inputBackground.y - 12,width,height,10)
+
+            inputText = context.add.text(inputBackground.x - 8, inputBackground.y - 13, '', { fontSize: '30px', color: "white" }).setData('index', "texto" + inputBackground.getData('index'));
             inputText.setName("texto" + index)
             //console.log(index)
         }
@@ -989,4 +997,45 @@ function createInfoButton() {
         infoButton.setVisible(false)
         buttonBackground.setVisible(false)
     });
+}
+
+function experimental(x,y,w,h){
+    let inputBackground = context.add.graphics({ fillStyle: { color: 0xeab676 } });
+
+    inputBackground.fillRoundedRect(
+        x,  // x position
+        y,  // y position
+        w,  // width of the rectangle
+        h,  // height of the rectangle
+        10 // radius of the corners
+    );
+    
+    // Make the graphic interactive
+    // inputBackground.setInteractive({ cursor: 'pointer' })
+    //     .on('pointerdown', function () {
+    //         // Change color on click
+    //         inputBackground.clear();
+    //         inputBackground.fillStyle(0xeab676, 1); // New color
+    //         inputBackground.fillRoundedRect(
+    //             context.sys.game.config.width / 5,
+    //             posY,
+    //             width,
+    //             height,
+    //             10
+    //         );
+    
+    //         // Handle other events and logic
+    //         inputTextBoxClicked = inputBackground.getData('index');
+    
+    //         if (!keyDownEventHandler) {
+    //             context.input.keyboard.on('keydown', handleTextInputChange, context);
+    //             keyDownEventHandler = true;
+    //         }
+    
+    //         let auxCajaTexto = context.children.getChildren()
+    //             .find(element => element.getData('index') == 'texto' + inputTextBoxClicked);
+    
+    //         // Add any other logic or animations here
+    //     });
+    
 }
