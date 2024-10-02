@@ -180,10 +180,11 @@ function create() {
 
     sprite2 = context.add.sprite(700, 250, 'mySprite2');
 
+    //banana
     this.anims.create({
         key: 'playAnimation3',
         frames: this.anims.generateFrameNumbers('mySprite3', { start: 0, end: 7 }), // Start and end frames
-        frameRate: 2, // Speed of the animation
+        frameRate: 5, // Speed of the animation
         repeat: -1 // Loop the animation
     });
     const sprite3 = this.add.sprite(100, 150, 'mySprite3');
@@ -204,10 +205,16 @@ function create() {
         key: 'playAnimation4',
         frames: this.anims.generateFrameNumbers('mySprite4', { start: 0, end: 13 }), // Start and end frames
         frameRate: 10, // Speed of the animation
-        repeat: -1 // Loop the animation
+        repeat: 1 // Loop the animation
     });
+    
     const sprite4 = this.add.sprite(1000, 255, 'mySprite4');
-    sprite4.play('playAnimation4'); // Play the animation 
+    
+    // Add pointerover event to play the animation when the sprite is hovered
+    sprite4.setInteractive(); // Make the sprite interactive to detect hover
+    sprite4.on('pointerover', () => {
+        sprite4.play('playAnimation4');
+    });
 }
 
 function update() {
