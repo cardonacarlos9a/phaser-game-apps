@@ -35,13 +35,11 @@ function update() {
 
 function create() {
     const textarea = document.getElementById('prompt');
-    // Add an event listener to the textarea for keydown events
     textarea.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevents new line in textarea when pressing Enter
-            // Get the value of the textarea
+        if (event.key === 'Enter' && textarea.value.length > 0) {
+            console.log(textarea.value)
+            event.preventDefault();
             const userInput = textarea.value;
-            // Clear the textarea after handling the input if needed
             textarea.value = '';
             if (userInput.includes('add')) {
                 add(userInput.split(' ')[1], userInput.split(' ')[2])
@@ -49,9 +47,10 @@ function create() {
             else if (userInput.includes('round corners')) {
                 roundVertex(userInput.split(' ')[2])
             } else if (userInput.toLowerCase().includes('change color')) {
-                changeBackgroundColor(userInput.split(' ')[2])
+                //changeBackgroundColor(userInput.split(' ')[2])
+                changeColorFunction[selectedItem.data.type](userInput.split(' ')[2])
             } else if (userInput.toLowerCase().includes('resize')) {
-                resizeShape(userInput.split(' ')[1], userInput.split(' ')[2])
+                resizeShape[selectedItem.data.type](userInput)
             }
         }
     });
@@ -61,13 +60,19 @@ function create() {
 function add(figureToAdd, params) {
     figures[figureToAdd](params)
 }
-function changeBackgroundColor(newColor) {
-    selectedItem.clear(); // Clear the current graphic
-    selectedItem.fillStyle(newColor, 1); // Set the new color
-    selectedItem.fillRoundedRect(100, 100, selectedItem.width, selectedItem.height, selectedItem.radius); //
-    selectedItem.backgroundColor = newColor
-    console.log(selectedItem)
+const changeColorFunction = {
+    square: (newColor) => {
+        selectedItem.clear(); // Clear the current graphic
+        selectedItem.fillStyle('0x' + newColor, 1); // Set the new color
+        selectedItem.fillRoundedRect(100, 100, selectedItem.width, selectedItem.height, selectedItem.radius); //
+        selectedItem.backgroundColor = '0x' + newColor
+        console.log(selectedItem)
+    },
+    text: (newColor) => {
+        selectedItem.setColor('#' + newColor)
+    }
 }
+
 function roundVertex(number) {
     let radius = parseInt(number, 10); // Extract the corner radius from input
     if (selectedItem) {
@@ -76,24 +81,27 @@ function roundVertex(number) {
         selectedItem.radius = radius
     }
 }
-function resizeShape(newWidth, newHeight) {
-    let width = parseInt(newWidth, 10); // Extract the corner radius from input
-    let height = parseInt(newHeight, 10); // Extract the corner radius from input
-    console.log(width, height)
-    // Ensure selectedItem has a radius property to avoid errors
-    if (typeof selectedItem.radius === 'undefined') {
-        selectedItem.radius = 0; // Default radius if it's not set
+const resizeShape = {
+    square: (userInput) => {
+        let width = parseInt(userInput.split(' ')[1], 10); // Extract the corner radius from input
+        let height = parseInt(userInput.split(' ')[2], 10); // Extract the corner radius from input
+        console.log(width, height)
+        // Ensure selectedItem has a radius property to avoid errors
+        if (typeof selectedItem.radius === 'undefined') {
+            selectedItem.radius = 0; // Default radius if it's not set
+        }
+        if (selectedItem) {
+            selectedItem.clear(); // Clear the current graphic
+            selectedItem.fillStyle(selectedItem.backgroundColor, 1); // Set the new color
+            // Redraw the shape with the new dimensions and existing radius
+            selectedItem.fillRoundedRect(100, 100, width, height, selectedItem.radius);
+            selectedItem.width = width
+            selectedItem.height = height
+        }
+    },
+    text: (userInput) => {
+        selectedItem.setFontSize(parseInt(userInput.split(' ')[1], 10));
     }
-    if (selectedItem) {
-        selectedItem.clear(); // Clear the current graphic
-        selectedItem.fillStyle(selectedItem.backgroundColor, 1); // Set the new color
-        // Redraw the shape with the new dimensions and existing radius
-        selectedItem.fillRoundedRect(100, 100, width, height, selectedItem.radius);
-        selectedItem.width = width
-        selectedItem.height = height
-    }
-    console.log(selectedItem.x, selectedItem.width)
-    console.log('resized element', selectedItem)
 }
 function changeBorderColor() {
 
@@ -126,7 +134,6 @@ const figures = {
             .setInteractive(new Phaser.Geom.Rectangle(100, 100, 100, 100), Phaser.Geom.Rectangle.Contains)
             .on('pointerdown', function () {
                 selectedItem = this
-                //graphics = selectedItem
             });
         graphics.data = { type: 'square' }
         graphics.radius = 0
@@ -190,13 +197,11 @@ const figures = {
         });
         // Set the text object to be interactive
         text.setInteractive();
+        text.data = { type: 'text' }
 
         // Add the pointerdown event to the text
         text.on('pointerdown', function () {
             console.log('Text clicked!');
-            // Add any action you want to perform when the text is clicked
-            // For example, you can change the color of the text
-            text.setColor('#ff0000'); // Change the text color to red
             selectedItem = this
         });
         setDraggingFunctionality(text)
