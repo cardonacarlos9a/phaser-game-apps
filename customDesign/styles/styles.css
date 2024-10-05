@@ -1,0 +1,53 @@
+.body{
+    background-color: red;
+}
+
+.prompt {
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+    width: 60vw;
+    /* Ensure the button appears above other content */
+}
+
+.floatingObject{
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+    width: 60vw;
+}
+
+.scroll-pane {
+    width: 200px; /* Set width of the pane */
+    height: 300px; /* Set height of the pane */
+    overflow-y: scroll; /* Add vertical scrollbar */
+    position: fixed; /* Fixed to the right */
+    right: 0;
+    top: 10%;
+    background-color: lightblue; /* Background color */
+    border: 1px solid #ccc; /* Border for the pane */
+    padding: 10px; /* Padding inside the pane */
+    height: 100%;
+}
+
+.item {
+    margin: 5px 0;
+    padding: 10px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+}
+
