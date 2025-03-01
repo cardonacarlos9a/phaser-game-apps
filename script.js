@@ -49,6 +49,7 @@ function create() {
         positionItemButon(context.sys.game.config.width * 0.4, 400, 'https://play-ground-angular-teaching.vercel.app/', 'Generador')
         positionItemButon(context.sys.game.config.width * 0.6, 400, '/books/index.html', 'Books')
         positionItemButon(context.sys.game.config.width * 0.2, 550, '/customDesign/index.html', 'Designs')
+        positionItemButon(context.sys.game.config.width * 0.4, 550, '/drawing/index.html', 'Drawing')
     }
     // Add CSS to remove border
     document.body.style.margin = '0';
@@ -168,5 +169,5 @@ function resizeBackground() {
 }
 
 function placeLogo() {
-    context.add.image(0, 0, 'logo').setOrigin(0).setScale(0.5,0.5)
+    context.add.image(0, 0, 'logo').setOrigin(0).setScale(0.5, 0.5)
 }
