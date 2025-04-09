@@ -6,12 +6,18 @@ let graphics;
 let isDrawing = false;
 let lastPosition = null;
 let isErasing = false;
+let toggleButton;
 
 function preload() {}
 
 function create() {
     graphics = this.add.graphics(); // Create a graphics object
     graphics.lineStyle(4, 0xAAEEAA, 1); // Set line thickness and color
+
+    // Create a button to toggle erase mode
+    toggleButton = this.add.text(10, 10, 'Toggle Erase', { font: '20px Arial', fill: '#fff' })
+        .setInteractive()
+        .on('pointerdown', toggleEraseMode);
 
     // Input handling for drawing
     this.input.on('pointerdown', (pointer) => {
@@ -22,12 +28,6 @@ function create() {
     this.input.on('pointerup', () => {
         isDrawing = false;
         lastPosition = null;
-    });
-
-    // Toggle erase mode with 'E' key
-    this.input.keyboard.on('keydown-E', () => {
-        isErasing = !isErasing;
-        console.log(isErasing ? "Erasing Mode ON" : "Drawing Mode ON");
     });
 }
 
@@ -46,4 +46,10 @@ function update() {
         }
         lastPosition = { x: pointer.x, y: pointer.y };
     }
+}
+
+function toggleEraseMode() {
+    isErasing = !isErasing;
+    toggleButton.setText(isErasing ? 'Erase Mode ON' : 'Draw Mode ON');
+    console.log(isErasing ? "Erasing Mode ON" : "Drawing Mode ON");
 }

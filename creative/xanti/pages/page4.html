@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .feedback {
+            font-size: 20px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .correct {
+            color: green;
+        }
+
+        .incorrect {
+            color: red;
+        }
+
+        #incorrectCount {
+            font-size: 18px;
+            font-weight: bold;
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <img class="statement" src="./exercises/exercise1.png" alt="Description of your image">
+
+    <div id="answer">
+        <h4>2. Él demora 5 minutos en ir de una esquina a la siguiente. ¿Cuántos minutos demora en ir desde su casa a la
+            casa de su tía?</h4>
+
+        <label>
+            <input type="radio" name="question2" value="a" onclick="checkAnswer(this)"> A. 3
+            <span class="feedback"></span>
+        </label>
+        <br>
+
+        <label>
+            <input type="radio" name="question2" value="b" onclick="checkAnswer(this)"> B. 5
+            <span class="feedback"></span>
+        </label>
+        <br>
+
+        <label>
+            <input type="radio" name="question2" value="c" onclick="checkAnswer(this)"> C. 10
+            <span class="feedback"></span>
+        </label>
+        <br>
+
+        <label>
+            <input type="radio" name="question2" value="d" onclick="checkAnswer(this)"> {4;5;10}
+            <span class="feedback"></span>
+        </label>
+        <br>
+
+        <div id="incorrectCount">Incorrect Attempts: 0</div>
+    </div>
+
+    <script>
+        let incorrectAttempts = 0;
+
+        function checkAnswer(selectedOption) {
+            let correctAnswer = "d"; // Correct answer value
+            let options = document.querySelectorAll('input[name="question2"]');
+
+            // Reset feedback for all options
+            options.forEach(option => {
+                let feedbackSpan = option.parentElement.querySelector(".feedback");
+                feedbackSpan.textContent = "";
+                feedbackSpan.classList.remove("correct", "incorrect");
+            });
+
+            let feedbackSpan = selectedOption.parentElement.querySelector(".feedback");
+            if (selectedOption.value === correctAnswer) {
+                feedbackSpan.textContent = " ✅";
+                feedbackSpan.classList.add("correct");
+            } else {
+                feedbackSpan.textContent = " ❌";
+                feedbackSpan.classList.add("incorrect");
+                incorrectAttempts++; // Increment incorrect attempts counter
+                document.getElementById("incorrectCount").textContent = "Incorrect Attempts: " + incorrectAttempts;
+            }
+        }
+    </script>
+</body>
+
+</html>

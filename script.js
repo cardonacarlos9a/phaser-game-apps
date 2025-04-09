@@ -50,6 +50,7 @@ function create() {
         positionItemButon(context.sys.game.config.width * 0.6, 400, '/books/index.html', 'Books')
         positionItemButon(context.sys.game.config.width * 0.2, 550, '/customDesign/index.html', 'Designs')
         positionItemButon(context.sys.game.config.width * 0.4, 550, '/drawing/index.html', 'Drawing')
+        positionItemButon(context.sys.game.config.width * 0.6, 550, '/creative/emily/index.html', 'Quizzy Riddle')
     }
     // Add CSS to remove border
     document.body.style.margin = '0';
